@@ -50,7 +50,12 @@ export default {
     }
   },
   methods: {
-    login () {}
+    login () {
+      this.isLoading = true
+      this.$router.push({
+        path: '/home'
+      })
+    }
   }
 }
 </script>
