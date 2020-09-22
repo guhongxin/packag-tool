@@ -6,11 +6,11 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/login',
-      name: 'login1',
+      path: '',
+      name: 'login',
       component: require('@/views/login/index').default
     }, {
-      path: '',
+      path: '/',
       component: require('@/views/layout/layout').default,
       children: [{
         path: '/home',
