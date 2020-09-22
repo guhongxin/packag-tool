@@ -87,7 +87,7 @@ export default {
   data () {
     return {
       title: '渠道名称',
-      dialogVisible: true,
+      dialogVisible: false,
       form: {},
       rules: {},
       currentMenu: 1

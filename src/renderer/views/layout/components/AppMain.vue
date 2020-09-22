@@ -10,9 +10,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-main {
-  height: calc(100vh - 60px);
-  background-color: #EFF1F4;
+  padding: 10px;
   box-sizing: border-box;
-  padding: 5px;
 }
 </style>

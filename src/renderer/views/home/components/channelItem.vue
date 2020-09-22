@@ -12,10 +12,10 @@
           </div>
         </div>
         <p class="channel-other-infor">
-          集成组件：<span class="span-txt">1</span>
+          集成组件：<span class="span-txt span-a" @click="jdicClick">1</span>
         </p>
         <p class="channel-other-infor">
-          渠道版本：<span class="span-txt">V1.0.0</span>
+          渠道版本：<span class="span-txt span-a" @click="versionClick">V1.0.0</span>
         </p>
       </div>
       <div class="channel-infor-right">
@@ -53,6 +53,12 @@ export default {
   methods: {
     findConfig () {
       this.$emit('findConfig')
+    },
+    jdicClick () {
+      this.$emit('jdicClick')
+    },
+    versionClick () {
+      this.$emit('versionClick')
     }
   }
 }
@@ -140,5 +146,10 @@ export default {
       }
     }
   }
+}
+.span-a {
+  color: rgb(64, 158, 255);
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

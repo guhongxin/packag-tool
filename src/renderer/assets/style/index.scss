@@ -10,3 +10,10 @@
     border-radius: 0px 0px 5px 5px;
   }
 }
+// 自定义table
+.custom-table {
+  /deep/ th {
+    padding: 0px;
+    font-weight: normal;
+  }
+}

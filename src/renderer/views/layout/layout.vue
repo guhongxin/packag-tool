@@ -25,11 +25,12 @@ export default {
   align-items: stretch;
   .layout-side-bar {
     width: 160px;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #1A1F27;
   }
   .main-content {
     flex: 1;
+    background-color: #EFF1F4;
   }
 }
 </style>

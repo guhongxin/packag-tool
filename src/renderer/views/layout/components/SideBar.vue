@@ -1,29 +1,31 @@
 <template>
-  <div class="side-bar">
-    <div class="logo">
-      <img src="../../../assets/image/logo.png" />
+  <div>
+    <div class="side-bar">
+      <div class="logo">
+        <img src="../../../assets/image/logo.png" />
+      </div>
+      <div class="game">
+        <div class="game-logo">
+          <img src="../../../assets/image/rmgame.png" />
+        </div>
+        <div class="search-box">
+          <el-input
+            placeholder="请输入内容"
+            size="small"
+            v-model="input4">
+            <i slot="suffix" class="el-input__icon el-icon-search"></i>
+          </el-input>
+        </div>
+        <div class="game-list">
+          <ul>
+            <li class="game-item active-game">末世强袭</li>
+            <li class="game-item">血色烂漫</li>
+            <li class="game-item">王者荣耀</li>
+          </ul>
+        </div>
+      </div>
+      <div class="edition">版本号：v-101</div>
     </div>
-    <div class="game">
-      <div class="game-logo">
-        <img src="../../../assets/image/rmgame.png" />
-      </div>
-      <div class="search-box">
-        <el-input
-          placeholder="请输入内容"
-          size="small"
-          v-model="input4">
-          <i slot="suffix" class="el-input__icon el-icon-search"></i>
-        </el-input>
-      </div>
-      <div class="game-list">
-        <ul>
-          <li class="game-item active-game">末世强袭</li>
-          <li class="game-item">血色烂漫</li>
-          <li class="game-item">王者荣耀</li>
-        </ul>
-      </div>
-    </div>
-    <div class="edition">版本号：v-101</div>
   </div>
 </template>
 <script>
@@ -38,7 +40,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .side-bar {
-  position: relative;
+  position: sticky;
+  top: 0px;
+  height: 100vh;
   .logo {
       width: 100%;
       height: 50px;

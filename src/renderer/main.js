@@ -14,7 +14,11 @@ import {
   Button,
   Input,
   Checkbox,
-  Dialog
+  Dialog,
+  Progress,
+  Table,
+  TableColumn,
+  Loading
 } from 'element-ui'
 
 import './permission.js'
@@ -25,6 +29,12 @@ Vue.use(Button)
 Vue.use(Input)
 Vue.use(Checkbox)
 Vue.use(Dialog)
+Vue.use(Progress)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Loading.directive)
+
+Vue.prototype.$loading = Loading.service
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
