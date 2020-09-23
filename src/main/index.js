@@ -22,7 +22,9 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 650,
     useContentSize: true,
-    width: 900
+    width: 900,
+    fullscreenable: false, // 禁用全屏
+    maximizable: false
   })
 
   mainWindow.loadURL(winURL)

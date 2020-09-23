@@ -21,6 +21,7 @@ export default {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0px;
+  z-index: 10;
   .menu {
     margin: 0px;
     padding: 0px;
