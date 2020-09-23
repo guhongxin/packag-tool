@@ -1,6 +1,13 @@
 <template>
   <div class="home">
-    <div class="game-config" v-if="step === 0">
+    <div class="step-status-box">
+      <el-steps :active="step" simple>
+        <el-step title="游戏配置" icon="el-icon-edit"></el-step>
+        <el-step title="渠道配置" icon="el-icon-upload"></el-step>
+        <el-step title="批量出包" icon="el-icon-picture"></el-step>
+      </el-steps>
+    </div>
+    <div class="game-config" v-if="step === 1">
       <el-form
         ref="form"
         :model="form"
@@ -49,53 +56,61 @@
           <el-input v-model="form.status"></el-input>
         </el-form-item>
       </el-form>
-    </div>
-    <div class="channel-config" v-else-if="step === 1">
-      <div class="channel-status-row">
-        <div class="channel-status-row-left">
-          <div class="statu-ts">
-            <i class="el-icon-success"></i>
-            <span>可用：<span>1</span></span>
-          </div>
-          <div class="statu-ts">
-            <i class="el-icon-remove"></i>
-            <span>未配置渠道：<span class="span-a" @click="noConfigChannel">1</span></span>
-          </div>
-          <div class="statu-ts">
-            <i class="el-icon-s-help"></i>
-            <span>已选渠道：<span>1</span></span>
-          </div>
-        </div>
-        <div class="channel-status-row-right">
-          <el-input
-            placeholder="多个渠道以空格分隔"
-            size="small"
-            v-model="input4">
-            <i slot="suffix" class="el-input__icon el-icon-search"></i>
-          </el-input>
-        </div>
-      </div>
-      <div class="channel-config-content">
-        <div class="cccl">
-          <div class="channel-list"></div>
-          <div class="cccl-footer">
-            <div class="cccl-footer-kj">
-              <i class="el-icon-s-operation"></i>
-              全选渠道
-            </div>
-            <div class="cccl-footer-kj">
-              <i class="el-icon-time"></i>
-              选择上次
-            </div>
-          </div>
-        </div>
-        <div class="cccr">
-          <channelItem @findConfig="findConfig"
-            @jdicClick="jdicClick"
-            @versionClick="versionClick"></channelItem>
-        </div>
+      <div class="game-config-footer">
+        <el-button type="primary" size="small" @click="stepClick1">下一步</el-button>
       </div>
     </div>
+    <template v-else-if="step === 2">
+      <div class="channel-config">
+        <div class="channel-status-row">
+          <div class="channel-status-row-left">
+            <div class="statu-ts">
+              <i class="el-icon-success"></i>
+              <span>可用：<span>1</span></span>
+            </div>
+            <div class="statu-ts">
+              <i class="el-icon-remove"></i>
+              <span>未配置渠道：<span class="span-a" @click="noConfigChannel">1</span></span>
+            </div>
+            <div class="statu-ts">
+              <i class="el-icon-s-help"></i>
+              <span>已选渠道：<span>1</span></span>
+            </div>
+          </div>
+          <div class="channel-status-row-right">
+            <el-input
+              placeholder="多个渠道以空格分隔"
+              size="small"
+              v-model="input4">
+              <i slot="suffix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+          </div>
+        </div>
+        <div class="channel-config-content">
+          <div class="cccl">
+            <div class="channel-list"></div>
+            <div class="cccl-footer">
+              <div class="cccl-footer-kj">
+                <i class="el-icon-s-operation"></i>
+                全选渠道
+              </div>
+              <div class="cccl-footer-kj">
+                <i class="el-icon-time"></i>
+                选择上次
+              </div>
+            </div>
+          </div>
+          <div class="cccr">
+            <channelItem @findConfig="findConfig"
+              @jdicClick="jdicClick"
+              @versionClick="versionClick"></channelItem>
+          </div>
+        </div>
+      </div>
+      <div class="channel-config-footer">
+        <el-button type="primary" size="small" @click="stepClick2">下一步</el-button>
+      </div>
+    </template>
     <div class="build-page" v-else>
       <div class="build-page-head">
         <ul class="build-menu">
@@ -204,6 +219,14 @@ export default {
     versionClick () {
       // 查看版本
       this.$refs.channelVersionDoc.showModule()
+    },
+    stepClick1 () {
+      // 第一步下一步
+      this.step = this.step + 1
+    },
+    stepClick2 () {
+      // 第二步下一步
+      this.step = this.step + 1
     }
   },
   components: {
@@ -222,8 +245,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .game-config {
-  width: 70%;
-  margin: 40px auto 0px;
+  width: 80%;
+  margin: 20px auto 0px;
   box-sizing: border-box;
   padding: 20px;
   background-color: #ffffff;
@@ -248,9 +271,13 @@ export default {
       }
     }
   }
+  .game-config-footer {
+    text-align: center;
+    margin-top: 30px;
+  }
 }
 .channel-config {
-  width: 70%;
+  width: 80%;
   margin: 40px auto 0px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -326,7 +353,7 @@ export default {
   }
 }
 .build-page {
-  width: 70%;
+  width: 80%;
   margin: 40px auto 0px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -423,5 +450,17 @@ export default {
   color: rgb(64, 158, 255);
   text-decoration: underline;
   cursor: pointer;
+}
+.step-status-box {
+  width: 80%;
+  margin: 20px auto 0px;
+  box-sizing: border-box;
+}
+.channel-config-footer {
+  margin-top: 30px;
+  text-align: center;
+}
+.step-status-box /deep/ .el-steps--simple {
+  background-color: #ffffff;
 }
 </style>

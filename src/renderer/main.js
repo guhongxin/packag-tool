@@ -18,7 +18,9 @@ import {
   Progress,
   Table,
   TableColumn,
-  Loading
+  Loading,
+  Steps,
+  Step
 } from 'element-ui'
 
 import './permission.js'
@@ -32,6 +34,8 @@ Vue.use(Dialog)
 Vue.use(Progress)
 Vue.use(Table)
 Vue.use(TableColumn)
+Vue.use(Steps)
+Vue.use(Step)
 Vue.use(Loading.directive)
 
 Vue.prototype.$loading = Loading.service
