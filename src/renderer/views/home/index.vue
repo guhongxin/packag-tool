@@ -108,6 +108,7 @@
         </div>
       </div>
       <div class="channel-config-footer">
+        <el-button type="primary" size="small" @click="backClick">上一步</el-button>
         <el-button type="primary" size="small" @click="stepClick2">下一步</el-button>
       </div>
     </template>
@@ -227,6 +228,9 @@ export default {
     stepClick2 () {
       // 第二步下一步
       this.step = this.step + 1
+    },
+    backClick () {
+      this.step = this.step - 1
     }
   },
   components: {
@@ -244,8 +248,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.home {
+  width: 700px;
+  min-width: 600px;
+  max-width: 800px;
+  margin: 0px auto;
+}
 .game-config {
-  width: 80%;
   margin: 20px auto 0px;
   box-sizing: border-box;
   padding: 20px;
@@ -277,7 +286,6 @@ export default {
   }
 }
 .channel-config {
-  width: 80%;
   margin: 40px auto 0px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -353,7 +361,6 @@ export default {
   }
 }
 .build-page {
-  width: 80%;
   margin: 40px auto 0px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -452,7 +459,6 @@ export default {
   cursor: pointer;
 }
 .step-status-box {
-  width: 80%;
   margin: 20px auto 0px;
   box-sizing: border-box;
 }
