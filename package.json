@@ -22,7 +22,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "packag-tool",
+    "productName": "打包工具",
     "appId": "com.example.yourapp",
     "directories": {
       "output": "build"

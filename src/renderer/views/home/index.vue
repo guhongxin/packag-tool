@@ -108,6 +108,8 @@
         </div>
       </div>
       <div class="channel-config-footer">
+        <el-button type="primary" size="small" @click="killtest">杀死进程</el-button>
+        <el-button type="primary" size="small" @click="test">运行</el-button>
         <el-button type="primary" size="small" @click="backClick">上一步</el-button>
         <el-button type="primary" size="small" @click="stepClick2">下一步</el-button>
       </div>
@@ -165,11 +167,12 @@ import journal from './components/journal'
 import channelTable from './components/channelTable'
 import JDIC from './components/JDIC'
 import channelVersion from './components/channelVersion'
+const exec = require('child_process').exec
 export default {
   name: 'home',
   data () {
     return {
-      step: 1,
+      step: 2,
       input4: '',
       input: '',
       form: {},
@@ -231,6 +234,44 @@ export default {
     },
     backClick () {
       this.step = this.step - 1
+    },
+    test () {
+      // 运行cmd
+      this.start()
+    },
+    start () {
+      let cmdStr1 = 'yarn serve'
+      let cmdPath = 'D:/web-project/mht_bi_media'
+      // 子进程名称
+      let workerProcess
+      let self = this
+      runExec(cmdStr1)
+      function runExec (cmdStr) {
+        workerProcess = exec(cmdStr, { cwd: cmdPath })
+        console.log('workerProcess', workerProcess)
+        console.log('workerProcess', workerProcess.pid)
+        self.pid = workerProcess.pid
+        console.log('---', self.pid)
+        // 打印正常的后台可执行程序输出
+        workerProcess.stdout.on('data', function (data) {
+          console.log('stdout: ' + data)
+        })
+        // 打印错误的后台可执行程序输出
+        workerProcess.stderr.on('data', function (data) {
+          console.log('stderr: ' + data)
+        })
+        // 退出之后的输出
+        workerProcess.on('close', function (code) {
+          console.log('out code：' + code)
+        })
+      }
+    },
+    killtest () {
+      console.log('------', this.pid)
+      exec(`TASKKILL /pid ${this.pid}`, function (err, data) {
+        if (err) console.log(err)
+        else console.log('kill pid: ' + this.pid + ' success!')
+      })
     }
   },
   components: {
