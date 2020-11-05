@@ -1,13 +1,13 @@
 <template>
   <div class="login">
     <div class="login-content">
-      <el-form ref="form" :model="form" size="small">
+      <el-form ref="form" :model="form" size="small" :rules="formRules">
         <h3 class="title">用户登录</h3>
-        <el-form-item prop="userName">
+        <el-form-item prop="username">
           <el-input
             @keyup.enter.native="login"
             type="text"
-            v-model="form.userName"
+            v-model.trim="form.username"
             auto-complete="off"
             placeholder="账号"
           ></el-input>
@@ -16,19 +16,21 @@
           <el-input
             @keyup.enter.native="login"
             type="password"
-            v-model="form.password"
+            v-model.trim="form.password"
             auto-complete="off"
             placeholder="密码"
           ></el-input>
         </el-form-item>
         <div class="remember-password">
-          <el-checkbox v-model="checked" class="checkbox" style="color: #C0C4CC;font-size: 10px;">记住密码</el-checkbox>
+          <el-checkbox v-model="isRememberPassword"
+            @change="rememberPasswordChange"
+            class="checkbox" style="color: #C0C4CC;font-size: 10px;">记住密码</el-checkbox>
         </div>
         <el-form-item style="width:100%;margin-top:42px;">
           <el-button
             type="primary"
             style="width:100%;"
-            @click="login"
+            @click="loginClick"
             :loading="isLoading"
             >登录</el-button
           >
@@ -38,23 +40,73 @@
   </div>
 </template>
 <script>
+import { login } from '@/api/pageApi'
+import { getCookie, setCookie, removeCookie } from '@/utils/auth.js'
 export default {
   name: 'login',
   data () {
     return {
       form: {
-        name: ''
+        username: '',
+        password: ''
+      },
+      formRules: {
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
       },
       isLoading: false,
-      checked: false
+      isRememberPassword: false
+    }
+  },
+  mounted () {
+    setCookie('token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVU0VSX0NMQUlNIjoie1widXNlcklkXCI6MSxcImV4cGlyZVRpbWVcIjoxNjA1MDc5MjE4ODY3fSJ9.KsQlgd7ecLEU7TEGNXUvYjr4k_2fNaK3wI6P6wlHB2c')
+    let _isRememberPassword = getCookie('isRememberPassword')
+    console.log('_isRememberPassword', _isRememberPassword)
+    if (!_isRememberPassword || _isRememberPassword === 'false') {
+      this.isRememberPassword = false
+    } else {
+      this.isRememberPassword = true
+      let _username = getCookie('username')
+      let _password = getCookie('password')
+      this.form.username = _username || ''
+      this.form.password = _password || ''
     }
   },
   methods: {
-    login () {
-      this.isLoading = true
-      this.$router.push({
-        path: '/home'
+    loginClick () {
+      // this.isLoading = true
+      // this.$router.push({
+      //   path: '/home'
+      // })
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.isLoading = true
+          this.loginApi(this.form)
+        } else {
+          return false
+        }
       })
+    },
+    loginApi (param) {
+      login(param).then(res => {
+        let data = res.data
+        this.isLoading = false
+        console.log('data', data)
+      }).catch(() => {
+        this.isLoading = false
+      })
+    },
+    rememberPasswordChange () {
+      // 记住密码
+      if (this.isRememberPassword) {
+        setCookie('isRememberPassword', this.isRememberPassword)
+        setCookie('username', this.form.username)
+        setCookie('password', this.form.password)
+      } else {
+        removeCookie('isRememberPassword')
+        removeCookie('username')
+        removeCookie('password')
+      }
     }
   }
 }
