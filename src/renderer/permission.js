@@ -8,7 +8,6 @@ NProgress.configure({ showSpinner: false }) // true/false 是否显示螺旋加�
 router.beforeEach((to, from, next) => {
   // 全局前置守卫
   NProgress.start() // start progress bar
-  console.log('to', to)
   next()
 })
 

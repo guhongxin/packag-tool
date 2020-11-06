@@ -18,9 +18,11 @@
         </div>
         <div class="game-list">
           <ul>
-            <li class="game-item active-game">末世强袭</li>
-            <li class="game-item">血色烂漫</li>
-            <li class="game-item">王者荣耀</li>
+            <li class="game-item"
+              v-for="(item, index) in gameData"
+              :key="item.key"
+              :class="{'active-game': currentGameIndex === index}"
+              @click="gameClick(index, item)">{{item.name}}</li>
           </ul>
         </div>
       </div>
@@ -29,11 +31,35 @@
   </div>
 </template>
 <script>
+import { appPaging } from '@/api/pageApi'
 export default {
   name: 'sidebar',
   data () {
     return {
-      input4: ''
+      input4: '',
+      listQuery: {
+        cur: 1,
+        count: 100
+      },
+      gameData: [],
+      currentGameIndex: 0 // 当前的游戏
+    }
+  },
+  mounted () {
+    this.gameList()
+  },
+  methods: {
+    gameList () {
+      // 游戏列表
+      appPaging(this.listQuery).then(res => {
+        this.gameData = res.content.records
+      }).catch(() => {
+        return false
+      })
+    },
+    gameClick (index, item) {
+      this.currentGameIndex = index
+      this.$store.dispatch('gameAction', item)
     }
   }
 }

@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "blueimp-md5": "^2.18.0",
     "element-ui": "^2.13.2",
     "js-cookie": "^2.2.1",
     "normalize.css": "^8.0.1",

@@ -167,17 +167,22 @@ import journal from './components/journal'
 import channelTable from './components/channelTable'
 import JDIC from './components/JDIC'
 import channelVersion from './components/channelVersion'
+import { channelPaging } from '@/api/pageApi'
 const exec = require('child_process').exec
 export default {
   name: 'home',
   data () {
     return {
-      step: 2,
+      step: 1,
       input4: '',
       input: '',
       form: {},
       activeMune: 1,
-      currentTabComponent: 'outBag'
+      currentTabComponent: 'outBag',
+      listQuery: {
+        cur: 1,
+        count: 100
+      }
     }
   },
   mounted () {
@@ -187,6 +192,7 @@ export default {
       let activeBar = document.querySelector('.active-bar')
       activeBar.style.width = wt / 3 + 'px'
     }
+    this.channelList()
   },
   methods: {
     openFile (param) {
@@ -234,6 +240,13 @@ export default {
     },
     backClick () {
       this.step = this.step - 1
+    },
+    channelList () {
+      channelPaging(this.listQuery).then(res => {
+        console.log('渠道列表', res)
+      }).catch(() => {
+        return false
+      })
     },
     test () {
       // 运行cmd

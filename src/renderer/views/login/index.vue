@@ -42,6 +42,7 @@
 <script>
 import { login } from '@/api/pageApi'
 import { getCookie, setCookie, removeCookie } from '@/utils/auth.js'
+import md5 from 'blueimp-md5'
 export default {
   name: 'login',
   data () {
@@ -59,9 +60,7 @@ export default {
     }
   },
   mounted () {
-    setCookie('token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVU0VSX0NMQUlNIjoie1widXNlcklkXCI6MSxcImV4cGlyZVRpbWVcIjoxNjA1MDc5MjE4ODY3fSJ9.KsQlgd7ecLEU7TEGNXUvYjr4k_2fNaK3wI6P6wlHB2c')
     let _isRememberPassword = getCookie('isRememberPassword')
-    console.log('_isRememberPassword', _isRememberPassword)
     if (!_isRememberPassword || _isRememberPassword === 'false') {
       this.isRememberPassword = false
     } else {
@@ -74,14 +73,14 @@ export default {
   },
   methods: {
     loginClick () {
-      // this.isLoading = true
-      // this.$router.push({
-      //   path: '/home'
-      // })
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.isLoading = true
-          this.loginApi(this.form)
+          let obj = {
+            username: this.form.username,
+            password: md5(this.form.password)
+          }
+          this.loginApi(obj)
         } else {
           return false
         }
@@ -89,9 +88,12 @@ export default {
     },
     loginApi (param) {
       login(param).then(res => {
-        let data = res.data
+        let data = res.content
+        setCookie('token', data.token)
         this.isLoading = false
-        console.log('data', data)
+        this.$router.push({
+          path: '/home'
+        })
       }).catch(() => {
         this.isLoading = false
       })
