@@ -3,7 +3,6 @@ const state = {
 }
 const mutations = {
   SET_GAME (state, param) {
-    console.log('store', param)
     state.game = param
   }
 }

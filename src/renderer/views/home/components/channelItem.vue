@@ -4,18 +4,18 @@
       <div class="channel-infor-left">
         <div class="channel-base-infor">
           <div class="channel-icon">
-            <img src="../../../assets/image/rmgame.png" /> 
+            <img :src="baseInfor.icon" /> 
           </div>
           <div class="channel-base-infor-txt">
-            <div class="channel-name">猕猴桃</div>
-            <div class="channel-no">渠道号：<span>1</span></div>
+            <div class="channel-name">{{baseInfor.name}}</div>
+            <div class="channel-no">渠道号：<span>暂无</span></div>
           </div>
         </div>
         <p class="channel-other-infor">
-          集成组件：<span class="span-txt span-a" @click="jdicClick">1</span>
+          集成组件：<span class="span-txt span-a" @click="jdicClick">暂无</span>
         </p>
         <p class="channel-other-infor">
-          渠道版本：<span class="span-txt span-a" @click="versionClick">V1.0.0</span>
+          渠道版本：<span class="span-txt span-a" @click="versionClick">暂无</span>
         </p>
       </div>
       <div class="channel-infor-right">
@@ -32,11 +32,11 @@
         <div class="w-from">
           <div class="w-from-item">
             <div class="w-from-item-label">包名</div>
-            <el-input v-model="input" placeholder="请输入内容" size="small"></el-input>
+            <el-input v-model="baseInfor.packageName" placeholder="请输入内容" size="small" disabled></el-input>
           </div>
             <div class="w-from-item">
             <div class="w-from-item-label">签名</div>
-            <el-input v-model="input" placeholder="请输入内容" size="small"></el-input>
+            <el-input v-model="baseInfor.certName" placeholder="请输入内容" size="small" disabled></el-input>
           </div>
         </div>
       </div>
@@ -45,6 +45,12 @@
 </template>
 <script>
 export default {
+  props: {
+    baseInfor: {
+      type: Object,
+      default: {}
+    }
+  },
   data () {
     return {
       input: ''

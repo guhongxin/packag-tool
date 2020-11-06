@@ -8,41 +8,55 @@
     <div slot="title">
       配置签名证书<i class="ad-icon el-icon-circle-plus" @click="addCertificate"></i>
     </div>
-    <div class="certificate-list">
+    <div class="certificate-list" v-loading="tableLoading">
       <ul>
-        <li class="certificate-list-item">
-          <span>戒灵证书</span>
-          <i class="w-edit-icon el-icon-edit"></i>
-        </li>
-         <li class="certificate-list-item">
-          <span>戒灵证书2</span>
-          <i class="w-edit-icon el-icon-edit"></i>
+        <li class="certificate-list-item" v-for="(item, index) in tableData" :key="index">
+          <div>
+            <i class="el-icon-success" style="color:#67C23A;" v-if="selectsignatureId===item.id"></i>
+            <span>{{item.name}}</span>
+          </div>
+          <!-- <i class="w-edit-icon el-icon-edit"></i> -->
         </li>
       </ul>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button size="small" @click="dialogVisible = false">取 消</el-button>
-      <el-button size="small" type="primary" @click="dialogVisible = false">确 定</el-button>
+      <el-button size="small" @click="cancelBtn">取 消</el-button>
+      <el-button size="small" type="primary" @click="btnOk">确 定</el-button>
     </div>
     <createCertificate ref="createCertificateDoc"></createCertificate>
   </el-dialog>
 </template>
 <script>
 import createCertificate from './createCertificate'
+import { certPaging } from '@/api/pageApi'
 export default {
   components: {
     createCertificate
   },
   data () {
     return {
-      dialogVisible: false
+      dialogVisible: false,
+      listQuery: {
+        cur: 1,
+        count: 100
+      },
+      tableData: [],
+      tableLoading: false,
+      selectsignatureId: 0 // 选中当前的证书id
     }
   },
   methods: {
     handleClose () {
+      this.selectsignatureId = 0
+      this.selectsignatureName = ''
       this.dialogVisible = false
     },
+    cancelBtn () {
+      // 取消按钮
+      this.handleClose()
+    },
     showModule () {
+      this.getList()
       this.dialogVisible = true
     },
     addCertificate () {
@@ -51,6 +65,36 @@ export default {
         title: '新增签名证书'
       }
       this.$refs.createCertificateDoc.showModule(obj)
+    },
+    getList () {
+      // 获取证书列表
+      this.tableLoading = true
+      certPaging(this.listQuery).then(res => {
+        let data = res.content.page.records
+        this.tableData = data
+        // 默认选中第一个证书
+        this.selectsignatureId = data[0] ? data[0].id : 0
+        this.selectsignatureName = data[0] ? data[0].name : 0
+        this.tableLoading = false
+      }).catch(() => {
+        this.tableLoading = false
+        return false
+      })
+    },
+    btnOk () {
+      // 确定按钮
+      if (!this.selectsignatureId) {
+        this.$message({
+          type: 'warning',
+          message: '请选择证书！'
+        })
+        return false
+      }
+      this.$emit('btnOK', {
+        selectsignatureName: this.selectsignatureName,
+        selectsignatureId: this.selectsignatureId
+      })
+      this.handleClose()
     }
   }
 }

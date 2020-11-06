@@ -13,6 +13,7 @@ import {
   FormItem,
   Button,
   Input,
+  CheckboxGroup,
   Checkbox,
   Dialog,
   Progress,
@@ -20,7 +21,8 @@ import {
   TableColumn,
   Loading,
   Steps,
-  Step
+  Step,
+  Message
 } from 'element-ui'
 
 import './permission.js'
@@ -29,6 +31,7 @@ Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Button)
 Vue.use(Input)
+Vue.use(CheckboxGroup)
 Vue.use(Checkbox)
 Vue.use(Dialog)
 Vue.use(Progress)
@@ -36,9 +39,11 @@ Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Steps)
 Vue.use(Step)
+
 Vue.use(Loading.directive)
 
 Vue.prototype.$loading = Loading.service
+Vue.prototype.$message = Message
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

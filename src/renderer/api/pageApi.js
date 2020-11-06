@@ -25,3 +25,21 @@ export const channelPaging = param => {
     data: param
   })
 }
+
+// 签名证书列表
+export const certPaging = param => {
+  return request({
+    method: 'POST',
+    url: '/cert/paging',
+    data: param
+  })
+}
+
+// 渠道
+export const bundlePaging = param => {
+  return request({
+    method: 'POST',
+    url: '/bundle/paging',
+    data: param
+  })
+}

@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import { getCookie } from '@/utils/auth.js'
-const baseURL = 'http://192.168.1.16:8080'
+
+const baseURL = process.env.BASE_URL
+
 const service = axios.create({
-  baseURL: baseURL // api的base_url
-  // timeout: 10000 // request timeout
+  baseURL: baseURL, // api的base_url
+  timeout: 10000 // request timeout
 })
-window._axiosPromiseArr = []
 
 service.interceptors.request.use(
   function (config) {
@@ -27,10 +28,6 @@ service.interceptors.response.use(
   function (response) {
     // 对响应数据做点什么
     let data = response.data
-    if (typeof data.code === 'undefined') {
-      console.error('请给接口 ' + response.config.url + ' 添加 code 字段')
-      return Promise.reject(data)
-    }
     if (Number(data.code) !== 0) {
       message(data.msg)
       return Promise.reject(data)

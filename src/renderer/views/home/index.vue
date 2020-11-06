@@ -16,35 +16,39 @@
         class="form"
       >
         <el-form-item label="产品状态">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.status" disabled></el-input>
         </el-form-item>
-        <el-form-item label="产品参数1" class="w-form-item">
-          <el-input v-model="form.status"></el-input>
-          <i class="input-ad-icon el-icon-circle-plus"></i>
+        <el-form-item label="KEY" class="w-form-item">
+          <el-input v-model="form.key" disabled></el-input>
+          <!-- <i class="input-ad-icon el-icon-circle-plus"></i> -->
+        </el-form-item>
+        <el-form-item label="Secret" class="w-form-item">
+          <el-input v-model="form.secret" disabled></el-input>
+          <!-- <i class="input-ad-icon el-icon-circle-plus"></i> -->
         </el-form-item>
         <el-form-item label="通知地址">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.returnAddress" disabled></el-input>
         </el-form-item>
         <el-form-item label="母包地址" class="w-form-item">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.busAddress"></el-input>
           <el-button
             type="primary"
             class="input-btn"
-            @click="openFile('openFile')"
+            @click="openFile('openFile', 'form', 'busAddress')"
             >选择母包</el-button
           >
         </el-form-item>
         <el-form-item label="输出路径" class="w-form-item">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.outputPath"></el-input>
           <el-button
             type="primary"
             class="input-btn"
-            @click="openFile('openDirectory')"
+            @click="openFile('openDirectory', 'form', 'outputPath')"
             >存放路径</el-button
           >
         </el-form-item>
         <el-form-item label="签名证书" class="w-form-item">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.signCertificate" disabled></el-input>
           <el-button
             type="primary"
             class="input-btn"
@@ -53,7 +57,7 @@
           >
         </el-form-item>
         <el-form-item label="输出文件名称">
-          <el-input v-model="form.status"></el-input>
+          <el-input v-model="form.fileName"></el-input>
         </el-form-item>
       </el-form>
       <div class="game-config-footer">
@@ -66,15 +70,15 @@
           <div class="channel-status-row-left">
             <div class="statu-ts">
               <i class="el-icon-success"></i>
-              <span>可用：<span>1</span></span>
+              <span>可用：<span>{{channelData.length}}</span></span>
             </div>
             <div class="statu-ts">
               <i class="el-icon-remove"></i>
-              <span>未配置渠道：<span class="span-a" @click="noConfigChannel">1</span></span>
+              <span>未配置渠道：<span class="span-a" @click="noConfigChannel">{{ channelData.length - selectChannelIds.length }}</span></span>
             </div>
             <div class="statu-ts">
               <i class="el-icon-s-help"></i>
-              <span>已选渠道：<span>1</span></span>
+              <span>已选渠道：<span>{{selectChannelIds.length}}</span></span>
             </div>
           </div>
           <div class="channel-status-row-right">
@@ -88,9 +92,16 @@
         </div>
         <div class="channel-config-content">
           <div class="cccl">
-            <div class="channel-list"></div>
+            <div class="channel-list">
+              <el-checkbox-group v-model="selectChannelIds">
+                <div class="chanel-list-item" v-for="(item, index) in channelData"
+                  :key="index">
+                  <el-checkbox :label="item.id">{{item.channel.name}}</el-checkbox>
+                </div>
+              </el-checkbox-group>
+            </div>
             <div class="cccl-footer">
-              <div class="cccl-footer-kj">
+              <div class="cccl-footer-kj" @click="selectAllChannel">
                 <i class="el-icon-s-operation"></i>
                 全选渠道
               </div>
@@ -101,7 +112,11 @@
             </div>
           </div>
           <div class="cccr">
-            <channelItem @findConfig="findConfig"
+            <channelItem
+              v-for="(item, index) in channelList"
+              :key="index"
+              :baseInfor="item"
+              @findConfig="findConfig"
               @jdicClick="jdicClick"
               @versionClick="versionClick"></channelItem>
           </div>
@@ -145,7 +160,8 @@
       </div>
     </div>
     <channelDetail ref="channelDetailDoc"></channelDetail>
-    <signatureCertificateDailog ref="signatureCertificateDailogDoc"></signatureCertificateDailog>
+    <signatureCertificateDailog ref="signatureCertificateDailogDoc"
+      @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog>
     <!-- 日志 -->
     <journal ref="journalDoc"></journal>
     <!-- 渠道列表 -->
@@ -157,6 +173,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 import signatureCertificateDailog from './components/signatureCertificateDailog'
 import channelItem from './components/channelItem'
 import channelDetail from './components/channelDetail'
@@ -167,7 +184,7 @@ import journal from './components/journal'
 import channelTable from './components/channelTable'
 import JDIC from './components/JDIC'
 import channelVersion from './components/channelVersion'
-import { channelPaging } from '@/api/pageApi'
+import { bundlePaging } from '@/api/pageApi'
 const exec = require('child_process').exec
 export default {
   name: 'home',
@@ -175,14 +192,24 @@ export default {
     return {
       step: 1,
       input4: '',
-      input: '',
-      form: {},
+      form: {
+        status: '',
+        key: '',
+        secret: '',
+        busAddress: '', // 母包地址
+        outputPath: '', // 输出地址
+        fileName: '', // 输出文件名
+        signCertificate: '' // 签名证书
+      },
       activeMune: 1,
       currentTabComponent: 'outBag',
       listQuery: {
         cur: 1,
         count: 100
-      }
+      },
+      channelData: [],
+      selectChannelIds: [],
+      channelList: []
     }
   },
   mounted () {
@@ -192,17 +219,31 @@ export default {
       let activeBar = document.querySelector('.active-bar')
       activeBar.style.width = wt / 3 + 'px'
     }
-    this.channelList()
   },
   methods: {
-    openFile (param) {
+    openFile (param, obj, key) {
       // 打开文件 是否是文件夹
+      this.showOpenDialog(param, result => {
+        if (result) {
+          this[obj][key] = result[0]
+        }
+      })
+    },
+    showOpenDialog (param, callback) {
       let _properties = param || 'openFile'
-      this.$electron.remote.dialog.showOpenDialog({ properties: [_properties] })
+      this.$electron.remote.dialog.showOpenDialog({ properties: [_properties] }, function (res) {
+        console.log('res', res)
+        callback(res)
+      })
     },
     signatureCertificate () {
       // 签名证书
       this.$refs.signatureCertificateDailogDoc.showModule()
+    },
+    signatureCertificateDailogDocBtn (param) {
+      // 签名证书确定
+      this.form.signCertificate = param.selectsignatureName
+      this.form.selectsignatureId = param.selectsignatureId
     },
     findConfig () {
       // 查看配置详情
@@ -232,21 +273,65 @@ export default {
     },
     stepClick1 () {
       // 第一步下一步
+      if (!this.form.busAddress) {
+        this.$message({
+          type: 'warning',
+          message: '请选择母包地址！'
+        })
+        return false
+      }
+      if (!this.form.outputPath) {
+        this.$message({
+          type: 'warning',
+          message: '请选择文件输出路径！'
+        })
+        return false
+      }
+      if (!this.form.fileName) {
+        this.$message({
+          type: 'warning',
+          message: '请输入文件名！'
+        })
+        return false
+      }
+      if (!this.form.signCertificate) {
+        this.$message({
+          type: 'warning',
+          message: '请选择签名证书！'
+        })
+        return false
+      }
       this.step = this.step + 1
+      this.getbundlePaging()
     },
     stepClick2 () {
       // 第二步下一步
-      this.step = this.step + 1
+      console.log('selectChannelIds', this.selectChannelIds)
+      // this.step = this.step + 1
     },
     backClick () {
       this.step = this.step - 1
     },
-    channelList () {
-      channelPaging(this.listQuery).then(res => {
-        console.log('渠道列表', res)
+    getbundlePaging () {
+      // 渠道列表
+      let obj = Object.assign({}, this.listQuery)
+      obj.appId = this.gameBaseInfor.id
+      bundlePaging(obj).then(res => {
+        let data = res.content.page.records
+        console.log('渠道', data)
+        this.channelData = data
       }).catch(() => {
         return false
       })
+    },
+    selectAllChannel () {
+      // 选择全部渠道
+      let _selectChannelIds = this.channelData.reduce((total, item) => {
+        total.push(item.id)
+        return total
+      }, [])
+      console.log('---', _selectChannelIds)
+      this.$set(this, 'selectChannelIds', _selectChannelIds)
     },
     test () {
       // 运行cmd
@@ -280,11 +365,24 @@ export default {
       }
     },
     killtest () {
-      console.log('------', this.pid)
       exec(`TASKKILL /pid ${this.pid}`, function (err, data) {
         if (err) console.log(err)
         else console.log('kill pid: ' + this.pid + ' success!')
       })
+    },
+    resetData () {
+      // 复位数据
+      this.form = {
+        status: '',
+        key: '',
+        secret: '',
+        busAddress: '', // 母包地址
+        outputPath: '', // 输出地址
+        fileName: '', // 输出文件名
+        signCertificate: '' // 签名证书
+      }
+      this.activeMune = 1
+      this.step = 1
     }
   },
   components: {
@@ -298,6 +396,40 @@ export default {
     channelTable,
     JDIC,
     channelVersion
+  },
+  computed: {
+    ...mapState({
+      gameBaseInfor: state => {
+        return state.Game.game
+      }
+    })
+  },
+  watch: {
+    gameBaseInfor (val) {
+      this.resetData()
+      this.form.status = val.status === 1 ? '在线' : '下线'
+      this.form.key = val.key
+      this.form.secret = val.secret
+      this.form.returnAddress = val.returnAddress
+    },
+    selectChannelIds: {
+      handler (val) {
+        this.channelList = []
+        for (let i = 0; i < val.length; i++) {
+          let obj = {
+            name: this.gameBaseInfor.name,
+            icon: this.gameBaseInfor.icon
+          }
+          let _channel = this.channelData.find(item => {
+            return item.id === val[i]
+          })
+          obj.packageName = _channel.packageName
+          obj.certName = _channel.cert.name
+          this.channelList.push(obj)
+        }
+      },
+      deep: true
+    }
   }
 }
 </script>
@@ -388,6 +520,12 @@ export default {
       flex-direction: column;
       .channel-list {
         flex: 1;
+        .chanel-list-item {
+          padding: 10px 10px;
+        }
+        .chanel-list-item:hover {
+          background-color: #f5f7fa;
+        }
       }
       .cccl-footer {
         width: 100%;

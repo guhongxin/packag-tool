@@ -6,7 +6,7 @@
       </div>
       <div class="game">
         <div class="game-logo">
-          <img src="../../../assets/image/rmgame.png" />
+          <img :src="icon" />
         </div>
         <div class="search-box">
           <el-input
@@ -37,6 +37,7 @@ export default {
   data () {
     return {
       input4: '',
+      icon: '',
       listQuery: {
         cur: 1,
         count: 100
@@ -52,13 +53,16 @@ export default {
     gameList () {
       // 游戏列表
       appPaging(this.listQuery).then(res => {
-        this.gameData = res.content.records
+        this.gameData = res.content.page.records
+        this.icon = this.gameData[0].icon
+        this.$store.dispatch('gameAction', this.gameData[0])
       }).catch(() => {
         return false
       })
     },
     gameClick (index, item) {
       this.currentGameIndex = index
+      this.icon = item.icon
       this.$store.dispatch('gameAction', item)
     }
   }

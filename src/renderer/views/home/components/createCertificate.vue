@@ -51,6 +51,7 @@ export default {
       title: '',
       dialogVisible: false,
       form: {},
+      checked: '',
       rules: {}
     }
   },
