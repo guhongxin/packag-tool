@@ -41,8 +41,10 @@
 </template>
 <script>
 import { login } from '@/api/pageApi'
-import { getCookie, setCookie, removeCookie } from '@/utils/auth.js'
+import { setCookie } from '@/utils/auth.js'
 import md5 from 'blueimp-md5'
+const fs = require('fs')
+const path = require('path')
 export default {
   name: 'login',
   data () {
@@ -60,15 +62,16 @@ export default {
     }
   },
   mounted () {
-    let _isRememberPassword = getCookie('isRememberPassword')
-    if (!_isRememberPassword || _isRememberPassword === 'false') {
-      this.isRememberPassword = false
-    } else {
+    this.configUrl = path.resolve('', 'config.json')
+    this.config = JSON.parse(fs.readFileSync(this.configUrl))
+    if (this.config.isRemember) {
       this.isRememberPassword = true
-      let _username = getCookie('username')
-      let _password = getCookie('password')
-      this.form.username = _username || ''
-      this.form.password = _password || ''
+      this.form.username = this.config.username || ''
+      this.form.password = this.config.password || ''
+    } else {
+      this.isRememberPassword = false
+      this.form.username = ''
+      this.form.password = ''
     }
   },
   methods: {
@@ -100,15 +103,24 @@ export default {
     },
     rememberPasswordChange () {
       // 记住密码
+      let obj = Object.assign({}, this.config)
       if (this.isRememberPassword) {
-        setCookie('isRememberPassword', this.isRememberPassword)
-        setCookie('username', this.form.username)
-        setCookie('password', this.form.password)
+        obj.isRemember = true
+        obj.username = this.form.username
+        obj.password = this.form.password
       } else {
-        removeCookie('isRememberPassword')
-        removeCookie('username')
-        removeCookie('password')
+        obj.isRemember = false
       }
+      fs.writeFileSync(this.configUrl, JSON.stringify(obj))
+      // if (this.isRememberPassword) {
+      //   setCookie('isRememberPassword', this.isRememberPassword)
+      //   setCookie('username', this.form.username)
+      //   setCookie('password', this.form.password)
+      // } else {
+      //   removeCookie('isRememberPassword')
+      //   removeCookie('username')
+      //   removeCookie('password')
+      // }
     }
   }
 }

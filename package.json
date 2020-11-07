@@ -1,6 +1,6 @@
 {
   "name": "packag-tool",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "guhongxin <1204738681@qq.com>",
   "description": "An electron-vue project",
   "license": null,
@@ -28,7 +28,8 @@
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*"
+      "dist/electron/**/*",
+      "config.json"
     ],
     "dmg": {
       "contents": [

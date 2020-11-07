@@ -9,9 +9,10 @@
     <div class="content">
       <div class="left">
         <ul class="menu">
-          <li class="menu-item active-menu-item" @click="menuItem(0)">客户端参数</li>
-          <li class="menu-item" @click="menuItem(1)">闪屏</li>
-          <li class="menu-item" @click="menuItem(2)">icon</li>
+          <li class="menu-item" v-for="(item, index) in menuOptions"
+            :class="{'active-menu-item': currentMenu === index}"
+            :key="index"
+            @click="menuItem(index)">{{item.text}}</li>
         </ul>
       </div>
       <div class="right">
@@ -24,10 +25,11 @@
               <el-form-item>
                 <p class="tishi">此处仅列出客户端参数、自定义参数, 服务器参数不在此处</p>
               </el-form-item>
-              <el-form-item label="GameId" prop="name" class="w-form-item">
-                <el-input v-model="form.name"></el-input>
+              
+              <el-form-item v-for="(item, index) in Object.keys(form)" :key="index" :label="item" prop="name" class="w-form-item">
+                <el-input v-model="form[item]" disabled></el-input>
               </el-form-item>
-              <el-form-item label="包名" prop="name" class="w-form-item">
+              <!-- <el-form-item label="包名" prop="name" class="w-form-item">
                 <el-input v-model="form.name"></el-input>
               </el-form-item>
               <el-form-item label="parentChannelCo" prop="name" class="w-form-item">
@@ -38,7 +40,7 @@
               </el-form-item>
               <el-form-item label="横竖屏设置" prop="name" class="w-form-item">
                 <el-input v-model="form.name"></el-input>
-              </el-form-item>
+              </el-form-item> -->
             </el-form>
           </template>
           <template v-else-if="currentMenu === 1">
@@ -90,15 +92,29 @@ export default {
       dialogVisible: false,
       form: {},
       rules: {},
-      currentMenu: 1
+      currentMenu: 0,
+      menuOptions: [{
+        text: '客户端参数'
+      }, {
+        text: '闪屏'
+      }, {
+        text: 'icon'
+      }],
+      baseInfor: {}
     }
   },
   methods: {
     handleClose () {
       this.dialogVisible = false
     },
-    showModule () {
+    showModule (param) {
       this.dialogVisible = true
+      this.baseInfor = param
+      console.log('----', param)
+      let clientParam = param.params
+      Object.keys(clientParam).forEach(item => {
+        this.$set(this.form, item, clientParam[item])
+      })
     },
     menuItem (param) {
       // 切换菜单

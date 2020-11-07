@@ -43,3 +43,12 @@ export const bundlePaging = param => {
     data: param
   })
 }
+
+// 打包
+export const bundleMake = param => {
+  return request({
+    method: 'POST',
+    url: '/bundle/make',
+    data: param
+  })
+}

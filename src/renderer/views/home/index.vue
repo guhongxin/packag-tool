@@ -56,9 +56,9 @@
             >签名证书</el-button
           >
         </el-form-item>
-        <el-form-item label="输出文件名称">
+        <!-- <el-form-item label="输出文件名称">
           <el-input v-model="form.fileName"></el-input>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div class="game-config-footer">
         <el-button type="primary" size="small" @click="stepClick1">下一步</el-button>
@@ -74,11 +74,11 @@
             </div>
             <div class="statu-ts">
               <i class="el-icon-remove"></i>
-              <span>未配置渠道：<span class="span-a" @click="noConfigChannel">{{ channelData.length - selectChannelIds.length }}</span></span>
+              <span>未配置渠道：<span class="span-a" @click="noConfigChannel">{{ channelData.length - channelIds.length }}</span></span>
             </div>
             <div class="statu-ts">
               <i class="el-icon-s-help"></i>
-              <span>已选渠道：<span>{{selectChannelIds.length}}</span></span>
+              <span>已选渠道：<span>{{channelIds.length}}</span></span>
             </div>
           </div>
           <div class="channel-status-row-right">
@@ -93,10 +93,10 @@
         <div class="channel-config-content">
           <div class="cccl">
             <div class="channel-list">
-              <el-checkbox-group v-model="selectChannelIds">
+              <el-checkbox-group v-model="channelIds">
                 <div class="chanel-list-item" v-for="(item, index) in channelData"
                   :key="index">
-                  <el-checkbox :label="item.id">{{item.channel.name}}</el-checkbox>
+                  <el-checkbox :label="item.id">{{item.channelName}}</el-checkbox>
                 </div>
               </el-checkbox-group>
             </div>
@@ -116,17 +116,15 @@
               v-for="(item, index) in channelList"
               :key="index"
               :baseInfor="item"
-              @findConfig="findConfig"
+              @findConfig="findConfig(item)"
               @jdicClick="jdicClick"
               @versionClick="versionClick"></channelItem>
           </div>
         </div>
       </div>
       <div class="channel-config-footer">
-        <el-button type="primary" size="small" @click="killtest">杀死进程</el-button>
-        <el-button type="primary" size="small" @click="test">运行</el-button>
         <el-button type="primary" size="small" @click="backClick">上一步</el-button>
-        <el-button type="primary" size="small" @click="stepClick2">下一步</el-button>
+        <el-button type="primary" size="small" :loading="stepClickLoading" @click="stepClick2">下一步</el-button>
       </div>
     </template>
     <div class="build-page" v-else>
@@ -184,8 +182,10 @@ import journal from './components/journal'
 import channelTable from './components/channelTable'
 import JDIC from './components/JDIC'
 import channelVersion from './components/channelVersion'
-import { bundlePaging } from '@/api/pageApi'
+import { bundlePaging, bundleMake } from '@/api/pageApi'
 const exec = require('child_process').exec
+const fs = require('fs')
+const path = require('path')
 export default {
   name: 'home',
   data () {
@@ -198,7 +198,7 @@ export default {
         secret: '',
         busAddress: '', // 母包地址
         outputPath: '', // 输出地址
-        fileName: '', // 输出文件名
+        // fileName: '', // 输出文件名
         signCertificate: '' // 签名证书
       },
       activeMune: 1,
@@ -208,8 +208,9 @@ export default {
         count: 100
       },
       channelData: [],
-      selectChannelIds: [],
-      channelList: []
+      channelIds: [],
+      channelList: [],
+      stepClickLoading: false
     }
   },
   mounted () {
@@ -245,9 +246,9 @@ export default {
       this.form.signCertificate = param.selectsignatureName
       this.form.selectsignatureId = param.selectsignatureId
     },
-    findConfig () {
+    findConfig (item) {
       // 查看配置详情
-      this.$refs.channelDetailDoc.showModule()
+      this.$refs.channelDetailDoc.showModule(item)
     },
     buildMenuItemClick (param) {
       this.activeMune = param
@@ -287,13 +288,6 @@ export default {
         })
         return false
       }
-      if (!this.form.fileName) {
-        this.$message({
-          type: 'warning',
-          message: '请输入文件名！'
-        })
-        return false
-      }
       if (!this.form.signCertificate) {
         this.$message({
           type: 'warning',
@@ -306,8 +300,34 @@ export default {
     },
     stepClick2 () {
       // 第二步下一步
-      console.log('selectChannelIds', this.selectChannelIds)
-      // this.step = this.step + 1
+      let _filePath = path.resolve('', '1.json')
+      console.log('_filePath', _filePath)
+      if (!this.channelIds || this.channelIds.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请选择渠道'
+        })
+        return false
+      }
+      this.stepClickLoading = true
+      this.setbundleMake(this.channelIds).then(res => {
+        // this.step = this.step + 1
+        let data = res.content.bundles
+        try {
+          fs.writeFileSync(_filePath, JSON.stringify(data))
+          console.log('this.from', this.form)
+          let javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
+          console.log('javaCli', javaCli)
+          let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -i ${this.form.busAddress} -o ${this.form.outputPath}`
+          console.log('_cmdStr', _cmdStr)
+          this.start(_cmdStr)
+        } catch (error) {
+          console.log('error', error)
+        }
+        this.stepClickLoading = false
+      }).catch(() => {
+        this.stepClickLoading = false
+      })
     },
     backClick () {
       this.step = this.step - 1
@@ -318,7 +338,6 @@ export default {
       obj.appId = this.gameBaseInfor.id
       bundlePaging(obj).then(res => {
         let data = res.content.page.records
-        console.log('渠道', data)
         this.channelData = data
       }).catch(() => {
         return false
@@ -326,30 +345,33 @@ export default {
     },
     selectAllChannel () {
       // 选择全部渠道
-      let _selectChannelIds = this.channelData.reduce((total, item) => {
+      let _channelIds = this.channelData.reduce((total, item) => {
         total.push(item.id)
         return total
       }, [])
-      console.log('---', _selectChannelIds)
-      this.$set(this, 'selectChannelIds', _selectChannelIds)
+      this.$set(this, 'channelIds', _channelIds)
     },
-    test () {
-      // 运行cmd
-      this.start()
+    setbundleMake (param) {
+      // 打包
+      let obj = {
+        ids: param
+      }
+      return new Promise((resolve, reject) => {
+        bundleMake(obj).then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
+        })
+      })
     },
-    start () {
-      let cmdStr1 = 'yarn serve'
-      let cmdPath = 'D:/web-project/mht_bi_media'
+    start (cmdStr) {
       // 子进程名称
       let workerProcess
       let self = this
-      runExec(cmdStr1)
+      runExec(cmdStr)
       function runExec (cmdStr) {
-        workerProcess = exec(cmdStr, { cwd: cmdPath })
-        console.log('workerProcess', workerProcess)
-        console.log('workerProcess', workerProcess.pid)
+        workerProcess = exec(cmdStr)
         self.pid = workerProcess.pid
-        console.log('---', self.pid)
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
           console.log('stdout: ' + data)
@@ -378,7 +400,7 @@ export default {
         secret: '',
         busAddress: '', // 母包地址
         outputPath: '', // 输出地址
-        fileName: '', // 输出文件名
+        // fileName: '', // 输出文件名
         signCertificate: '' // 签名证书
       }
       this.activeMune = 1
@@ -412,7 +434,7 @@ export default {
       this.form.secret = val.secret
       this.form.returnAddress = val.returnAddress
     },
-    selectChannelIds: {
+    channelIds: {
       handler (val) {
         this.channelList = []
         for (let i = 0; i < val.length; i++) {
@@ -423,10 +445,16 @@ export default {
           let _channel = this.channelData.find(item => {
             return item.id === val[i]
           })
+          obj.id = _channel.id
           obj.packageName = _channel.packageName
-          obj.certName = _channel.cert.name
+          obj.certName = _channel.certName
+          obj.params = _channel.params
+          obj.channelIcon = _channel.icon
+          obj.horPic = _channel.horPic
+          obj.verPic = _channel.verPic
           this.channelList.push(obj)
         }
+        console.log('this.channelList', this.channelList)
       },
       deep: true
     }
