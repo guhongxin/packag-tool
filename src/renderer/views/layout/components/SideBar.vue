@@ -12,7 +12,8 @@
           <el-input
             placeholder="请输入内容"
             size="small"
-            v-model="input4">
+            v-model="gameName"
+            @change="searchName">
             <i slot="suffix" class="el-input__icon el-icon-search"></i>
           </el-input>
         </div>
@@ -36,12 +37,13 @@ export default {
   name: 'sidebar',
   data () {
     return {
-      input4: '',
+      gameName: '',
       icon: '',
       listQuery: {
         cur: 1,
         count: 100
       },
+      sourceData: [],
       gameData: [],
       currentGameIndex: 0 // 当前的游戏
     }
@@ -53,6 +55,7 @@ export default {
     gameList () {
       // 游戏列表
       appPaging(this.listQuery).then(res => {
+        this.sourceData = JSON.parse(JSON.stringify(res.content.page.records))
         this.gameData = res.content.page.records
         this.icon = this.gameData[0].icon
         this.$store.dispatch('gameAction', this.gameData[0])
@@ -64,6 +67,17 @@ export default {
       this.currentGameIndex = index
       this.icon = item.icon
       this.$store.dispatch('gameAction', item)
+    },
+    searchName (val) {
+      let reg = new RegExp(val, 'i')
+      this.gameData = this.sourceData.filter(item => {
+        return reg.test(item.name)
+      })
+      if (this.gameData && this.gameData.length > 0) {
+        this.currentGameIndex = 0
+        this.icon = this.gameData[0].icon
+        this.$store.dispatch('gameAction', this.gameData[0])
+      }
     }
   }
 }

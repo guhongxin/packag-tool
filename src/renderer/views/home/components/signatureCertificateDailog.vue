@@ -6,7 +6,8 @@
     :before-close="handleClose"
     class="customDialog">
     <div slot="title">
-      配置签名证书<i class="ad-icon el-icon-circle-plus" @click="addCertificate"></i>
+      配置签名证书
+      <!-- <i class="ad-icon el-icon-circle-plus" @click="addCertificate"></i> -->
     </div>
     <div class="certificate-list" v-loading="tableLoading">
       <ul>

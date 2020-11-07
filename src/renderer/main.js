@@ -22,7 +22,8 @@ import {
   Loading,
   Steps,
   Step,
-  Message
+  Message,
+  Icon
 } from 'element-ui'
 
 import './permission.js'
@@ -39,7 +40,7 @@ Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Steps)
 Vue.use(Step)
-
+Vue.use(Icon)
 Vue.use(Loading.directive)
 
 Vue.prototype.$loading = Loading.service

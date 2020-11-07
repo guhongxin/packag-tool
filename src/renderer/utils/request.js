@@ -2,8 +2,13 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import { getCookie } from '@/utils/auth.js'
 
-const baseURL = process.env.BASE_URL
+const fs = require('fs')
+const path = require('path')
 
+const configUrl = path.resolve('', 'config.json')
+const config = JSON.parse(fs.readFileSync(configUrl))
+const baseURL = config.BASE_URL
+console.log('kk', baseURL)
 const service = axios.create({
   baseURL: baseURL, // api的base_url
   timeout: 10000 // request timeout

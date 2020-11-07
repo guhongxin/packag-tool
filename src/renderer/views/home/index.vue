@@ -47,7 +47,7 @@
             >存放路径</el-button
           >
         </el-form-item>
-        <el-form-item label="签名证书" class="w-form-item">
+        <!-- <el-form-item label="签名证书" class="w-form-item">
           <el-input v-model="form.signCertificate" disabled></el-input>
           <el-button
             type="primary"
@@ -55,7 +55,7 @@
             @click="signatureCertificate"
             >签名证书</el-button
           >
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="输出文件名称">
           <el-input v-model="form.fileName"></el-input>
         </el-form-item> -->
@@ -85,7 +85,8 @@
             <el-input
               placeholder="多个渠道以空格分隔"
               size="small"
-              v-model="input4">
+              v-model="channelName"
+              @change="searchChannelName">
               <i slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
           </div>
@@ -157,9 +158,9 @@
         </div>
       </div>
     </div>
-    <channelDetail ref="channelDetailDoc"></channelDetail>
-    <signatureCertificateDailog ref="signatureCertificateDailogDoc"
-      @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog>
+    <!-- <channelDetail ref="channelDetailDoc"></channelDetail> -->
+    <!-- <signatureCertificateDailog ref="signatureCertificateDailogDoc"
+      @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog> -->
     <!-- 日志 -->
     <journal ref="journalDoc"></journal>
     <!-- 渠道列表 -->
@@ -191,15 +192,14 @@ export default {
   data () {
     return {
       step: 1,
-      input4: '',
+      channelName: '',
       form: {
         status: '',
         key: '',
         secret: '',
         busAddress: '', // 母包地址
-        outputPath: '', // 输出地址
+        outputPath: '' // 输出地址
         // fileName: '', // 输出文件名
-        signCertificate: '' // 签名证书
       },
       activeMune: 1,
       currentTabComponent: 'outBag',
@@ -237,15 +237,15 @@ export default {
         callback(res)
       })
     },
-    signatureCertificate () {
-      // 签名证书
-      this.$refs.signatureCertificateDailogDoc.showModule()
-    },
-    signatureCertificateDailogDocBtn (param) {
-      // 签名证书确定
-      this.form.signCertificate = param.selectsignatureName
-      this.form.selectsignatureId = param.selectsignatureId
-    },
+    // signatureCertificate () {
+    //   // 签名证书
+    //   this.$refs.signatureCertificateDailogDoc.showModule()
+    // },
+    // signatureCertificateDailogDocBtn (param) {
+    //   // 签名证书确定
+    //   this.form.signCertificate = param.selectsignatureName
+    //   this.form.selectsignatureId = param.selectsignatureId
+    // },
     findConfig (item) {
       // 查看配置详情
       this.$refs.channelDetailDoc.showModule(item)
@@ -285,13 +285,6 @@ export default {
         this.$message({
           type: 'warning',
           message: '请选择文件输出路径！'
-        })
-        return false
-      }
-      if (!this.form.signCertificate) {
-        this.$message({
-          type: 'warning',
-          message: '请选择签名证书！'
         })
         return false
       }
@@ -405,6 +398,12 @@ export default {
       }
       this.activeMune = 1
       this.step = 1
+      this.channelName = ''
+    },
+    searchChannelName (val) {
+      // 渠道名称搜索
+      let channelNames = val.spilt(',')
+      console.log('---', channelNames)
     }
   },
   components: {

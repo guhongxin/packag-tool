@@ -2,7 +2,7 @@
   <div class="login">
     <div class="login-content">
       <el-form ref="form" :model="form" size="small" :rules="formRules">
-        <h3 class="title">用户登录</h3>
+        <h3 class="title" @dblclick="setHttp">用户登录</h3>
         <el-form-item prop="username">
           <el-input
             @keyup.enter.native="login"
@@ -37,11 +37,13 @@
         </el-form-item>
       </el-form>
     </div>
+    <httpConfigDaliog ref="httpConfigDaliogDoc" @btnOk="httpConfigDaliogDocBtnOk"></httpConfigDaliog>
   </div>
 </template>
 <script>
 import { login } from '@/api/pageApi'
 import { setCookie } from '@/utils/auth.js'
+import httpConfigDaliog from './components/httpConfigDaliog'
 import md5 from 'blueimp-md5'
 const fs = require('fs')
 const path = require('path')
@@ -112,16 +114,20 @@ export default {
         obj.isRemember = false
       }
       fs.writeFileSync(this.configUrl, JSON.stringify(obj))
-      // if (this.isRememberPassword) {
-      //   setCookie('isRememberPassword', this.isRememberPassword)
-      //   setCookie('username', this.form.username)
-      //   setCookie('password', this.form.password)
-      // } else {
-      //   removeCookie('isRememberPassword')
-      //   removeCookie('username')
-      //   removeCookie('password')
-      // }
+    },
+    setHttp () {
+      // 设置请求路径
+      this.$refs.httpConfigDaliogDoc.showModule(this.config)
+    },
+    httpConfigDaliogDocBtnOk (param) {
+      this.config.BASE_URL = param
+      let obj = Object.assign({}, this.config)
+      fs.writeFileSync(this.configUrl, JSON.stringify(obj))
+      this.$refs.httpConfigDaliogDoc.handleClose()
     }
+  },
+  components: {
+    httpConfigDaliog
   }
 }
 </script>

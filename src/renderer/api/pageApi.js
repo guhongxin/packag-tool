@@ -52,3 +52,12 @@ export const bundleMake = param => {
     data: param
   })
 }
+
+// 更新bundle
+export const bundleUpdate = param => {
+  return request({
+    method: 'POST',
+    url: '/bundle/update',
+    data: param
+  })
+}
