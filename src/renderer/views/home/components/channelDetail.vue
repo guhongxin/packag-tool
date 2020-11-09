@@ -46,15 +46,20 @@
           <template v-else-if="currentMenu === 1">
             <div class="flash-screen">
               <el-tabs v-model="flashScreen" type="border-card">
-                <el-tab-pane label="竖屏" name="vorPic">
+                <el-tab-pane label="竖屏" name="verPic">
                   <div class="flash-screen-content">
                     <div class="flash-screen-content-left">
-                      <div class="preview-screen"></div>
+                      <div class="preview-screen">
+                        <img :src="baseInfor.verPic"  class="vorImg"/>
+                      </div>
                       <p class="wz-js">现有闪屏</p>
                     </div>
                     <div class="flash-screen-content-right">
                       <div class="preview-screen">
-                        <img :src="vorPicUrl"  class="vorImg"/>
+                        <img :src="verPic"  class="vorImg"/>
+                        <div v-if="verPic" class="delete-box">
+                          <i class="el-icon-delete" @click="deleImage('verPic')"></i>
+                        </div>
                       </div>
                       <el-button type="primary" size="small" class="add-btn" @click="uploadBtn">添加闪屏</el-button>
                       <p class="wz-js">格式说明</p>
@@ -64,12 +69,17 @@
                 <el-tab-pane label="横屏" name="horPic">
                   <div class="flash-screen-content1">
                     <div class="flash-screen-content-left">
-                      <div class="preview-screen"></div>
+                      <div class="preview-screen">
+                        <img :src="baseInfor.horPic"  class="vorImg"/>
+                      </div>
                       <p class="wz-js">现有闪屏</p>
                     </div>
                     <div class="flash-screen-content-right">
                       <div class="preview-screen">
-                        <img :src="horPicUrl"  class="vorImg"/>
+                        <img :src="horPic"  class="vorImg"/>
+                        <div v-if="horPic" class="delete-box">
+                          <i class="el-icon-delete" @click="deleImage('horPic')"></i>
+                        </div>
                       </div>
                       <el-button type="primary" size="small" class="add-btn" @click="uploadBtn">添加闪屏</el-button>
                       <p class="wz-js">格式说明</p>
@@ -90,7 +100,7 @@
               <div class="icon-screen-content">
                 <div class="icon-screen-content-left">
                   <div class="icon-screen">
-                    <img :src="this.baseInfor.params.icon" style="width: 100%"/>
+                    <img :src="baseInfor.icon" style="width: 100%"/>
                   </div>
                   <p class="wz-js">现有icon</p>
                 </div>
@@ -140,9 +150,9 @@ export default {
       VUE_APP_IMGURL: '',
       iconUrl: '',
       saveIconLoading: false,
-      flashScreen: 'vorPic',
-      vorPicUrl: '',
-      horPicUrl: '',
+      flashScreen: 'verPic',
+      verPic: '',
+      horPic: '',
       saveFlashScreenLoading: false
     }
   },
@@ -200,18 +210,26 @@ export default {
           icon: this.iconUrl
         }
       }
-      this.setbundleUpdate(obj, '更新icon成功', 'saveIconLoading')
+      this.setbundleUpdate(obj, '更新icon成功', 'saveIconLoading').then(() => {
+        this.baseInfor.icon = this.iconUrl
+      }).catch(() => {
+        return false
+      })
     },
     setbundleUpdate (param, msg, loading) {
       this[loading] = true
-      bundleUpdate(param).then(res => {
-        this[loading] = false
-        this.$message({
-          type: 'success',
-          message: msg
+      return new Promise((resolve, reject) => {
+        bundleUpdate(param).then(res => {
+          this[loading] = false
+          this.$message({
+            type: 'success',
+            message: msg
+          })
+          resolve(res)
+        }).catch(err => {
+          this[loading] = false
+          reject(err)
         })
-      }).catch(() => {
-        this[loading] = false
       })
     },
     uploadBtn () {
@@ -236,12 +254,12 @@ export default {
         }).then(res => {
           let data = res.data.data
           let _resourceURL = self.VUE_APP_IMGURL + data.resourceURL
-          if (self.flashScreen === 'vorPic') {
+          if (self.flashScreen === 'verPic') {
             // 竖屏
-            self.vorPicUrl = _resourceURL
+            self.verPic = _resourceURL
           } else {
             // 横屏
-            self.horPicUrl = _resourceURL
+            self.horPic = _resourceURL
           }
           self.$message({
             type: 'success',
@@ -258,9 +276,9 @@ export default {
     },
     saveFlashScreen () {
       // 保存闪屏
-      if (this.flashScreen === 'vorPic') {
+      if (this.flashScreen === 'verPic') {
         // 竖屏
-        if (!this.vorPicUrl) {
+        if (!this.verPic) {
           this.$message({
             type: 'warning',
             message: '请上传竖屏闪屏！'
@@ -270,13 +288,17 @@ export default {
         let obj = {
           id: this.baseInfor.id,
           metas: {
-            vorPicUrl: this.vorPicUrl
+            verPic: this.verPic
           }
         }
-        this.setbundleUpdate(obj, '更新竖屏成功', 'saveFlashScreenLoading')
+        this.setbundleUpdate(obj, '更新竖屏成功', 'saveFlashScreenLoading').then(res => {
+          this.baseInfor.verPic = this.verPic
+        }).catch(() => {
+          return false
+        })
       } else {
         // 横屏
-        if (!this.horPicUrl) {
+        if (!this.horPic) {
           this.$message({
             type: 'warning',
             message: '请上传横屏闪屏！'
@@ -286,11 +308,18 @@ export default {
         let obj = {
           id: this.baseInfor.id,
           metas: {
-            horPicUrl: this.horPicUrl
+            horPic: this.horPic
           }
         }
-        this.setbundleUpdate(obj, '更新横屏成功', 'saveFlashScreenLoading')
+        this.setbundleUpdate(obj, '更新横屏成功', 'saveFlashScreenLoading').then(res => {
+          this.baseInfor.horPic = this.horPic
+        }).catch(() => {
+          return false
+        })
       }
+    },
+    deleImage (key) {
+      this[key] = ''
     }
   }
 }
@@ -376,6 +405,7 @@ export default {
       height: 300px;
       overflow: hidden;
       border: 1px solid #f5f7fa;
+      position: relative;
       .vorImg {
         width: 100%;
       }
@@ -398,6 +428,7 @@ export default {
       height: 150px;
       overflow: hidden;
       border: 1px solid #f5f7fa;
+      position: relative;
       .vorImg {
         width: 100%;
       }
@@ -463,5 +494,25 @@ export default {
   width: 80px;
   height: 80px;
   display: block;
+}
+.preview-screen:hover .delete-box{
+  display: flex;
+}
+.delete-box {
+  display: none;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3 linear;
+  i {
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
+  }
 }
 </style>

@@ -330,6 +330,7 @@ export default {
       obj.appId = this.gameBaseInfor.id
       bundlePaging(obj).then(res => {
         let data = res.content.page.records
+        this.copyChannelData = JSON.parse(JSON.stringify(data))
         this.channelData = data
       }).catch(() => {
         return false
@@ -398,11 +399,19 @@ export default {
       this.activeMune = 1
       this.step = 1
       this.channelName = ''
+      this.copyChannelData = []
     },
     searchChannelName (val) {
       // 渠道名称搜索
-      let channelNames = val.spilt(',')
-      console.log('---', channelNames)
+      let channelNames = val.split(',')
+      this.channelData = []
+      for (let i = 0; i < channelNames.length; i++) {
+        let reg = new RegExp(channelNames[i], 'i')
+        let _channelData = this.copyChannelData.filter(item => {
+          return reg.test(item.bundleName)
+        })
+        this.channelData = [...this.channelData, ..._channelData]
+      }
     }
   },
   components: {
@@ -438,7 +447,7 @@ export default {
         for (let i = 0; i < val.length; i++) {
           let obj = {
             name: this.gameBaseInfor.name,
-            icon: this.gameBaseInfor.icon
+            gameIcon: this.gameBaseInfor.icon
           }
           let _channel = this.channelData.find(item => {
             return item.id === val[i]
@@ -451,6 +460,7 @@ export default {
           obj.horPic = _channel.horPic
           obj.verPic = _channel.verPic
           obj.bundleName = _channel.bundleName
+          obj.icon = _channel.icon
           this.channelList.push(obj)
         }
       },

@@ -4,7 +4,7 @@
       <div class="channel-infor-left">
         <div class="channel-base-infor">
           <div class="channel-icon">
-            <img :src="baseInfor.icon" /> 
+            <img :src="baseInfor.gameIcon" /> 
           </div>
           <div class="channel-base-infor-txt">
             <div class="channel-name">{{baseInfor.name}}</div>
@@ -33,6 +33,7 @@
           <div class="w-from-item">
             <div class="w-from-item-label">包名</div>
             <el-input v-model="baseInfor.packageName" placeholder="请输入内容" size="small" disabled></el-input>
+            <i class="el-icon-edit-outline editIcon" @click="editPackageName"></i>
           </div>
             <div class="w-from-item">
             <div class="w-from-item-label">签名</div>
@@ -41,9 +42,12 @@
         </div>
       </div>
     </div>
+    <editPackAgeName ref="editPackAgeNameDoc" @btnOk="editPackAgeNameDocBtnOk"></editPackAgeName>
   </div>
 </template>
 <script>
+import editPackAgeName from './editPackAgeName'
+import { bundleUpdate } from '@/api/pageApi'
 export default {
   props: {
     baseInfor: {
@@ -52,9 +56,7 @@ export default {
     }
   },
   data () {
-    return {
-      input: ''
-    }
+    return {}
   },
   methods: {
     findConfig () {
@@ -65,7 +67,35 @@ export default {
     },
     versionClick () {
       this.$emit('versionClick')
+    },
+    editPackageName () {
+      this.$refs.editPackAgeNameDoc.showModule(this.baseInfor)
+    },
+    editPackAgeNameDocBtnOk (param) {
+      console.log('***', param)
+      this.setbundleUpdate(param).then(res => {
+        this.$message({
+          type: 'success',
+          message: '修改包名成功！'
+        })
+        this.baseInfor.packageName = param.packageName
+        this.$refs.editPackAgeNameDoc.handleClose()
+      }).catch(() => {
+        this.$refs.editPackAgeNameDoc.btnLoading = false
+      })
+    },
+    setbundleUpdate (param, msg, loading) {
+      return new Promise((resolve, reject) => {
+        bundleUpdate(param).then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
+        })
+      })
     }
+  },
+  components: {
+    editPackAgeName
   }
 }
 </script>
@@ -156,6 +186,10 @@ export default {
 .span-a {
   color: rgb(64, 158, 255);
   text-decoration: underline;
+  cursor: pointer;
+}
+.editIcon {
+  color: rgb(64, 158, 255);
   cursor: pointer;
 }
 </style>
