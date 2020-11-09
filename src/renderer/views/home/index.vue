@@ -367,6 +367,7 @@ export default {
         self.pid = workerProcess.pid
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
+          console.log('---111--')
           console.log('stdout: ' + data)
         })
         // 打印错误的后台可执行程序输出
