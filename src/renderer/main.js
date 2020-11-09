@@ -23,7 +23,10 @@ import {
   Steps,
   Step,
   Message,
-  Icon
+  Icon,
+  Upload,
+  Tabs,
+  TabPane
 } from 'element-ui'
 
 import './permission.js'
@@ -41,6 +44,9 @@ Vue.use(TableColumn)
 Vue.use(Steps)
 Vue.use(Step)
 Vue.use(Icon)
+Vue.use(Upload)
+Vue.use(Tabs)
+Vue.use(TabPane)
 Vue.use(Loading.directive)
 
 Vue.prototype.$loading = Loading.service

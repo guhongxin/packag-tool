@@ -45,19 +45,43 @@
           </template>
           <template v-else-if="currentMenu === 1">
             <div class="flash-screen">
-              <div class="flash-screen-content">
-                <div class="flash-screen-content-left">
-                  <div class="preview-screen"></div>
-                  <p class="wz-js">现有闪屏</p>
-                </div>
-                <div class="flash-screen-content-right">
-                  <div class="preview-screen"></div>
-                  <el-button type="primary" size="small" class="add-btn">添加闪屏</el-button>
-                  <p class="wz-js">格式说明</p>
-                </div>
-              </div>
+              <el-tabs v-model="flashScreen" type="border-card">
+                <el-tab-pane label="竖屏" name="vorPic">
+                  <div class="flash-screen-content">
+                    <div class="flash-screen-content-left">
+                      <div class="preview-screen"></div>
+                      <p class="wz-js">现有闪屏</p>
+                    </div>
+                    <div class="flash-screen-content-right">
+                      <div class="preview-screen">
+                        <img :src="vorPicUrl"  class="vorImg"/>
+                      </div>
+                      <el-button type="primary" size="small" class="add-btn" @click="uploadBtn">添加闪屏</el-button>
+                      <p class="wz-js">格式说明</p>
+                    </div>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="横屏" name="horPic">
+                  <div class="flash-screen-content1">
+                    <div class="flash-screen-content-left">
+                      <div class="preview-screen"></div>
+                      <p class="wz-js">现有闪屏</p>
+                    </div>
+                    <div class="flash-screen-content-right">
+                      <div class="preview-screen">
+                        <img :src="horPicUrl"  class="vorImg"/>
+                      </div>
+                      <el-button type="primary" size="small" class="add-btn" @click="uploadBtn">添加闪屏</el-button>
+                      <p class="wz-js">格式说明</p>
+                    </div>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            
               <div class="flash-screen-foolter">
-                <el-button type="primary" size="small">保存</el-button>
+                <el-button type="primary" size="small"
+                  :loading="saveFlashScreenLoading"
+                  @click="saveFlashScreen">保存</el-button>
               </div>
             </div>
           </template>
@@ -65,17 +89,26 @@
             <div class="icon-change">
               <div class="icon-screen-content">
                 <div class="icon-screen-content-left">
-                  <div class="icon-screen"></div>
+                  <div class="icon-screen">
+                    <img :src="this.baseInfor.params.icon" style="width: 100%"/>
+                  </div>
                   <p class="wz-js">现有icon</p>
                 </div>
                 <div class="icon-screen-content-right">
-                  <div class="icon-screen"></div>
-                  <el-button type="primary" size="small" class="add-btn">添加ICON</el-button>
-                  <p class="wz-js">格式说明</p>
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="VUE_APP_UPLOADURL + '/upload/single'"
+                    :show-file-list="false"
+                    :on-success="handleIconSuccess"
+                    :before-upload="beforeIconUpload">
+                    <img v-if="iconUrl" :src="iconUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
                 </div>
               </div>
               <div class="icon-screen-foolter">
-                <el-button type="primary" size="small">保存</el-button>
+                <el-button type="primary" size="small" @click="saveIcon"
+                  :loading="saveIconLoading">保存</el-button>
               </div>
             </div>
           </template>
@@ -85,6 +118,8 @@
   </el-dialog>
 </template>
 <script>
+import { bundleUpdate } from '@/api/pageApi'
+import axios from 'axios'
 export default {
   data () {
     return {
@@ -100,8 +135,20 @@ export default {
       }, {
         text: 'icon'
       }],
-      baseInfor: {}
+      baseInfor: {},
+      VUE_APP_UPLOADURL: '',
+      VUE_APP_IMGURL: '',
+      iconUrl: '',
+      saveIconLoading: false,
+      flashScreen: 'vorPic',
+      vorPicUrl: '',
+      horPicUrl: '',
+      saveFlashScreenLoading: false
     }
+  },
+  created () {
+    this.VUE_APP_UPLOADURL = process.env.VUE_APP_UPLOADURL
+    this.VUE_APP_IMGURL = process.env.VUE_APP_IMGURL
   },
   methods: {
     handleClose () {
@@ -110,15 +157,140 @@ export default {
     showModule (param) {
       this.dialogVisible = true
       this.baseInfor = param
-      console.log('----', param)
       let clientParam = param.params
       Object.keys(clientParam).forEach(item => {
-        this.$set(this.form, item, clientParam[item])
+        if (item !== 'icon') {
+          this.$set(this.form, item, clientParam[item])
+        }
       })
     },
     menuItem (param) {
       // 切换菜单
       this.currentMenu = param
+    },
+    handleIconSuccess (res, file) {
+      // 更新成功
+      let data = res.data
+      this.iconUrl = this.VUE_APP_IMGURL + data.resourceURL
+    },
+    beforeIconUpload (file) {
+      // 更新之前
+      let type = file.type
+      // if (!/\.ico/.test(type)) {
+      //   this.$message({
+      //     type: 'warning',
+      //     message: '请上传格式为ico图片'
+      //   })
+      //   return false
+      // }
+      console.log('更新之前', type)
+    },
+    saveIcon () {
+      // 保存icon
+      if (!this.iconUrl) {
+        this.$message({
+          type: 'warning',
+          message: '请上传icon！'
+        })
+        return false
+      }
+      let obj = {
+        id: this.baseInfor.id,
+        metas: {
+          icon: this.iconUrl
+        }
+      }
+      this.setbundleUpdate(obj, '更新icon成功', 'saveIconLoading')
+    },
+    setbundleUpdate (param, msg, loading) {
+      this[loading] = true
+      bundleUpdate(param).then(res => {
+        this[loading] = false
+        this.$message({
+          type: 'success',
+          message: msg
+        })
+      }).catch(() => {
+        this[loading] = false
+      })
+    },
+    uploadBtn () {
+      // 上传按钮
+      let input = document.createElement('input')
+      input.type = 'file'
+      input.setAttribute('readonly', '')
+      input.style.position = 'absolute'
+      input.style.left = '-9999px'
+      document.body.appendChild(input)
+      input.click()
+      let self = this
+      input.onchange = function (e) {
+        let file = e.target.files[0]
+        let formdata = new FormData()
+        document.body.removeChild(input)
+        formdata.append('file', file)
+        axios({
+          url: `${self.VUE_APP_UPLOADURL}/upload/single`,
+          method: 'POST',
+          data: formdata
+        }).then(res => {
+          let data = res.data.data
+          let _resourceURL = self.VUE_APP_IMGURL + data.resourceURL
+          if (self.flashScreen === 'vorPic') {
+            // 竖屏
+            self.vorPicUrl = _resourceURL
+          } else {
+            // 横屏
+            self.horPicUrl = _resourceURL
+          }
+          self.$message({
+            type: 'success',
+            message: '上传成功'
+          })
+        }).catch(() => {
+          self.$message({
+            type: 'error',
+            message: '上传失败'
+          })
+        })
+      }
+      input.value = ''
+    },
+    saveFlashScreen () {
+      // 保存闪屏
+      if (this.flashScreen === 'vorPic') {
+        // 竖屏
+        if (!this.vorPicUrl) {
+          this.$message({
+            type: 'warning',
+            message: '请上传竖屏闪屏！'
+          })
+          return false
+        }
+        let obj = {
+          id: this.baseInfor.id,
+          metas: {
+            vorPicUrl: this.vorPicUrl
+          }
+        }
+        this.setbundleUpdate(obj, '更新竖屏成功', 'saveFlashScreenLoading')
+      } else {
+        // 横屏
+        if (!this.horPicUrl) {
+          this.$message({
+            type: 'warning',
+            message: '请上传横屏闪屏！'
+          })
+          return false
+        }
+        let obj = {
+          id: this.baseInfor.id,
+          metas: {
+            horPicUrl: this.horPicUrl
+          }
+        }
+        this.setbundleUpdate(obj, '更新横屏成功', 'saveFlashScreenLoading')
+      }
     }
   }
 }
@@ -202,11 +374,38 @@ export default {
     }
     .preview-screen {
       height: 300px;
+      overflow: hidden;
       border: 1px solid #f5f7fa;
+      .vorImg {
+        width: 100%;
+      }
+    }
+  }
+  .flash-screen-content1 {
+    .flash-screen-content-left,
+    .flash-screen-content-right {
+      text-align: center;
+      flex: 1;
+      padding: 10px;
+      .wz-js {
+        text-align: center;
+      }
+      .add-btn {
+        margin-top: 10px;
+      }
+    }
+    .preview-screen {
+      height: 150px;
+      overflow: hidden;
+      border: 1px solid #f5f7fa;
+      .vorImg {
+        width: 100%;
+      }
     }
   }
   .flash-screen-foolter {
     text-align: center;
+    margin-top: 15px;
   }
 }
 .icon-change {
@@ -233,10 +432,36 @@ export default {
       height: 80px;
       border: 1px solid #f5f7fa;
       margin: 0px auto;
+      position: relative;
     }
   }
   .icon-screen-foolter {
     text-align: center;
   }
+}
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 80px;
+  height: 80px;
+}
+.avatar-uploader:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+}
+.avatar {
+  width: 80px;
+  height: 80px;
+  display: block;
 }
 </style>

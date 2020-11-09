@@ -97,7 +97,7 @@
               <el-checkbox-group v-model="channelIds">
                 <div class="chanel-list-item" v-for="(item, index) in channelData"
                   :key="index">
-                  <el-checkbox :label="item.id">{{item.channelName}}</el-checkbox>
+                  <el-checkbox :label="item.id">{{item.bundleName}}</el-checkbox>
                 </div>
               </el-checkbox-group>
             </div>
@@ -158,7 +158,7 @@
         </div>
       </div>
     </div>
-    <!-- <channelDetail ref="channelDetailDoc"></channelDetail> -->
+    <channelDetail ref="channelDetailDoc"></channelDetail>
     <!-- <signatureCertificateDailog ref="signatureCertificateDailogDoc"
       @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog> -->
     <!-- 日志 -->
@@ -294,7 +294,6 @@ export default {
     stepClick2 () {
       // 第二步下一步
       let _filePath = path.resolve('', '1.json')
-      console.log('_filePath', _filePath)
       if (!this.channelIds || this.channelIds.length === 0) {
         this.$message({
           type: 'warning',
@@ -451,9 +450,9 @@ export default {
           obj.channelIcon = _channel.icon
           obj.horPic = _channel.horPic
           obj.verPic = _channel.verPic
+          obj.bundleName = _channel.bundleName
           this.channelList.push(obj)
         }
-        console.log('this.channelList', this.channelList)
       },
       deep: true
     }

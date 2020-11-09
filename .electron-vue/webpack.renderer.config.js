@@ -171,7 +171,9 @@ if (process.env.NODE_ENV !== 'production') {
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`,
-      'process.env.BASE_URL': '"http://192.168.1.16:8080"'
+      'process.env.BASE_URL': '"http://192.168.1.16:8080"',
+      'process.env.VUE_APP_UPLOADURL': '"http://122.112.165.158:9003"',
+      'process.env.VUE_APP_IMGURL': '"http://material-mhtsdk.jingmakeji.top"'
     })
   )
 }
@@ -193,7 +195,9 @@ if (process.env.NODE_ENV === 'production') {
     ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
-      'process.env.BASE_URL': '"http://192.168.1.16:8080"'
+      'process.env.BASE_URL': '"http://192.168.1.16:8080"',
+      'process.env.VUE_APP_UPLOADURL': '"http://122.112.165.158:9003"',
+      'process.env.VUE_APP_IMGURL': '"http://material-mhtsdk.jingmakeji.top"'
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true

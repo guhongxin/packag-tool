@@ -8,7 +8,8 @@ const path = require('path')
 const configUrl = path.resolve('', 'config.json')
 const config = JSON.parse(fs.readFileSync(configUrl))
 const baseURL = config.BASE_URL
-console.log('kk', baseURL)
+console.log('kk', process.env.VUE_APP_UPLOADURL)
+console.log('kk', process.env.VUE_APP_IMGURL)
 const service = axios.create({
   baseURL: baseURL, // api的base_url
   timeout: 10000 // request timeout
