@@ -191,7 +191,7 @@ export default {
   name: 'home',
   data () {
     return {
-      step: 1,
+      step: 3,
       channelName: '',
       form: {
         status: '',
@@ -398,7 +398,7 @@ export default {
         signCertificate: '' // 签名证书
       }
       this.activeMune = 1
-      this.step = 1
+      this.step = 3
       this.channelName = ''
       this.copyChannelData = []
     },
