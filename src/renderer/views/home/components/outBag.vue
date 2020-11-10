@@ -2,19 +2,34 @@
   <div class="out-bag">
     <div class="status-icon"></div>
     <div class="game-logo">
-      <img src="../../../assets/image/rmgame.png" />
+      <img :src="fileInfor.icon" />
     </div>
-    <div class="game-name">UC九游</div>
+    <div class="game-name">{{fileInfor.bundleName}}</div>
     <div class="progress">
-      <el-progress :percentage="50" color="#67C23A"></el-progress>
+      <el-progress :percentage="fileInfor.per"
+        :show-text="false"
+        color="#67C23A"></el-progress>
     </div>
-    <div class="cz">
+    <div class="cz copyfileUrl" v-if="fileInfor.per > 0" @click="copyFileDir">
       拷贝文件目录
     </div>
+    <div class="cz" v-else>正在等待其它操作</div>
   </div>
 </template>
 <script>
-export default {}
+export default {
+  props: {
+    fileInfor: {
+      type: Object,
+      defalute: {}
+    }
+  },
+  methods: {
+    copyFileDir () {
+      this.$emit('copyFileDir')
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .out-bag {
@@ -56,6 +71,8 @@ export default {}
     width: 40px;
     height: 40px;
     margin-right: 10px;
+    overflow: hidden;
+    border-radius: 50%;
     img {
       width: 100%;
       display: block;
@@ -71,6 +88,11 @@ export default {}
   .cz {
     width: 100px;
     font-size: 12px;
+    margin-left: 5px;
+  }
+  .copyfileUrl {
+    cursor: pointer;
+    color: #409EFF;
   }
 }
 </style>

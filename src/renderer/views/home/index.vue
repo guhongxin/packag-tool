@@ -132,29 +132,39 @@
       <div class="build-page-head">
         <ul class="build-menu">
           <div class="active-bar"></div>
-          <li class="build-menu-item" :class="{activeMenu: activeMune === 0}" @click="buildMenuItemClick(0)">出包中<span>(0)</span></li>
-          <li class="build-menu-item" :class="{activeMenu: activeMune === 1}" @click="buildMenuItemClick(1)">成功<span>(1)</span></li>
-          <li class="build-menu-item" :class="{activeMenu: activeMune === 2}" @click="buildMenuItemClick(2)">失败<span>(2)</span></li>
+          <li class="build-menu-item" :class="{activeMenu: activeMune === 0}" @click="buildMenuItemClick(0)">出包中<span>({{packing.length}})</span></li>
+          <li class="build-menu-item" :class="{activeMenu: activeMune === 1}" @click="buildMenuItemClick(1)">成功<span>({{packageSuccessful.length}})</span></li>
+          <li class="build-menu-item" :class="{activeMenu: activeMune === 2}" @click="buildMenuItemClick(2)">失败<span>({{packageError.length}})</span></li>
         </ul>
         <div class="build-page-head-right">
-          <span class="el-icon-upload" @click="viewlog">
-            <span class="tishi-span">2</span>
+          <span class="el-icon-upload" @click="viewlog" v-if="activeMune === 2">
+            <span class="tishi-span">{{againPackage.length}}</span>
           </span>
-          <span class="el-icon-reading" @click="viewlog"></span>
+          <!-- <span class="el-icon-reading" @click="viewlog"></span> -->
         </div>
       </div>
       <div class="build-page-content">
         <div v-if="activeMune === 0" class="package-padding">
-          <outBag class="outBage"></outBag>
-          <outBag class="outBage"></outBag>
+          <outBag class="outBage" 
+            v-for="(item, index) in packing"
+            :key="index"
+            :fileInfor="item"
+            @copyFileDir="copyFileDir(item)"></outBag>
         </div>
         <div v-else-if="activeMune === 1" class="package-cg">
-          <packageSuccess class="packageSuccess"></packageSuccess>
-          <packageSuccess class="packageSuccess"></packageSuccess>
+          <packageSuccess class="packageSuccess"
+            v-for="(item, index) in packageSuccessful"
+            :key="index"
+            :fileInfor="item"
+            @openFileHandler="openFileHandler(item)"></packageSuccess>
         </div>
         <div v-else class="package-sb">
-          <packagefailed @viewlog="viewlog" class="packagefailed"></packagefailed>
-          <packagefailed @viewlog="viewlog" class="packagefailed"></packagefailed>
+          <packagefailed
+            v-for="(item, index) in packageError"
+            :key="index"
+            :fileInfor="item"
+            @changeChange="val => packageErrorItemChange(val, item)"
+            @viewlog="viewlog" class="packagefailed"></packagefailed>
         </div>
       </div>
     </div>
@@ -191,7 +201,7 @@ export default {
   name: 'home',
   data () {
     return {
-      step: 3,
+      step: 1,
       channelName: '',
       form: {
         status: '',
@@ -201,7 +211,7 @@ export default {
         outputPath: '' // 输出地址
         // fileName: '', // 输出文件名
       },
-      activeMune: 1,
+      activeMune: 0,
       currentTabComponent: 'outBag',
       listQuery: {
         cur: 1,
@@ -210,7 +220,11 @@ export default {
       channelData: [],
       channelIds: [],
       channelList: [],
-      stepClickLoading: false
+      stepClickLoading: false,
+      packing: [], // 正在打包
+      packageSuccessful: [], // 打包成功
+      packageError: [], // 打包异常
+      againPackage: [] // 重新上传的包
     }
   },
   mounted () {
@@ -303,15 +317,30 @@ export default {
       }
       this.stepClickLoading = true
       this.setbundleMake(this.channelIds).then(res => {
-        // this.step = this.step + 1
+        this.step = this.step + 1
+        // 获取正在打包的文件
+        this.packing = this.channelIds.reduce((total, item) => {
+          let _packChannelData = this.channelData.find(item1 => item1.id === item)
+          if (_packChannelData) {
+            let obj = {
+              bundleId: item,
+              name: this.gameBaseInfor.name,
+              bundleName: _packChannelData.bundleName, // 渠道名
+              outputPath: this.form.outputPath, // 输出文件路径
+              icon: _packChannelData.icon,
+              per: 0, // 百分比
+              journal: [] // 日志
+            }
+            total.push(obj)
+          }
+          return total
+        }, [])
         let data = res.content.bundles
         try {
           fs.writeFileSync(_filePath, JSON.stringify(data))
-          console.log('this.from', this.form)
           let javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
-          console.log('javaCli', javaCli)
-          let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -i ${this.form.busAddress} -o ${this.form.outputPath}`
-          console.log('_cmdStr', _cmdStr)
+          let javaCli1 = path.resolve('', './fusion-playground.zip')
+          let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -d ${javaCli1}  -i ${this.form.busAddress} -o ${this.form.outputPath}`
           this.start(_cmdStr)
         } catch (error) {
           console.log('error', error)
@@ -361,18 +390,26 @@ export default {
       // 子进程名称
       let workerProcess
       let self = this
+      let reg = /\{.*\}/g
       runExec(cmdStr)
       function runExec (cmdStr) {
         workerProcess = exec(cmdStr)
         self.pid = workerProcess.pid
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
-          console.log('---111--')
-          console.log('stdout: ' + data)
+          let progress = data.match(reg) // 获取内容
+          if (progress) {
+            let _progress = JSON.parse(progress[0])
+            let _packChannelIndex = self.packing.findIndex(item => _progress.bundleId === item.bundleId)
+            self.$set(self.packing[_packChannelIndex], 'per', _progress.per * 100)
+          }
         })
         // 打印错误的后台可执行程序输出
         workerProcess.stderr.on('data', function (data) {
           console.log('stderr: ' + data)
+          let errData = JSON.parse(JSON.stringify(self.packing))
+          self.packageError = errData
+          self.packing = []
         })
         // 退出之后的输出
         workerProcess.on('close', function (code) {
@@ -397,8 +434,8 @@ export default {
         // fileName: '', // 输出文件名
         signCertificate: '' // 签名证书
       }
-      this.activeMune = 1
-      this.step = 3
+      this.activeMune = 0
+      this.step = 1
       this.channelName = ''
       this.copyChannelData = []
     },
@@ -413,6 +450,33 @@ export default {
         })
         this.channelData = [...this.channelData, ..._channelData]
       }
+    },
+    openFileHandler (param) {
+      // 打开目录
+      let outputPath = param.outputPath
+      let _path = path.resolve('', outputPath)
+      this.$electron.shell.openExternal(_path)
+    },
+    copyFileDir (param) {
+      // 拷贝目录
+      let outputPath = param.outputPath
+      const el = document.createElement('input')
+      el.setAttribute('readonly', '')
+      el.style.position = 'absolute'
+      el.style.left = '-9999px'
+      el.value = outputPath
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+      this.$message({
+        type: 'success',
+        message: '复制成功！'
+      })
+    },
+    packageErrorItemChange (val, item) {
+      // 打包失败页面没一项前面的选中
+      this.$set(item, 'checked', val)
     }
   },
   components: {
@@ -464,6 +528,26 @@ export default {
           obj.icon = _channel.icon
           this.channelList.push(obj)
         }
+      },
+      deep: true
+    },
+    packing: {
+      handler (val) {
+        for (let i = 0; i < val.length; i++) {
+          // 查看有没有执行完成的包 进度为100% 代表完成
+          if (val[i].per === 100) {
+            this.packageSuccessful.push(val[i])
+            val.splice(i)
+          }
+        }
+        console.log('this.packageSuccessful', this.packageSuccessful)
+      },
+      deep: true
+    },
+    packageError: {
+      handler (val) {
+        let _selectval = val.filter(item => item.checked)
+        this.againPackage = _selectval
       },
       deep: true
     }

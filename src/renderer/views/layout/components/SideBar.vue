@@ -87,6 +87,8 @@ export default {
   position: sticky;
   top: 0px;
   height: 100vh;
+  overflow: hidden;
+  overflow-y: auto;
   .logo {
       width: 100%;
       height: 50px;
@@ -123,7 +125,7 @@ export default {
       margin-right: -10px;
       ul {
         margin: 0px;
-        padding: 0px;
+        padding: 0px 0px 50px;
         li {
           list-style-type:none;
           color: #ffffff;
@@ -147,15 +149,16 @@ export default {
     }
   }
   .edition {
-    width: 100%;
+    width: 160px;
     height: 50px;
-    position: absolute;
+    position: fixed;
     bottom: 0px;
     left: 0px;
     padding: 0px 5px;
     line-height: 50px;
     font-size: 12px;
     color: #ffffff;
+    background-color: rgb(38, 52, 69);
     box-sizing: border-box;
   }
 }

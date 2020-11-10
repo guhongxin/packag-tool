@@ -1,26 +1,42 @@
 <template>
   <div class="package-failed">
-    <i class="el-icon-success" style="color:#67C23A;font-size:20px;"></i>
+    <!-- <i class="el-icon-success" style="color:#67C23A;font-size:20px;"></i> -->
+    <el-checkbox v-model="checked" @change="changeChange"></el-checkbox>
     <div class="game-logo">
-      <img src="../../../assets/image/rmgame.png" />
+      <img :src="fileInfor.icon" />
     </div>
     <div class="infor">
-      <div class="game-name">UC九游</div>
+      <div class="game-name">{{fileInfor.name}}</div>
       <div class="errInfor">
         <i class="el-icon-location"></i>
-        移动到母包缓存记录
+        {{fileInfor.bundleName}}
       </div>
     </div>
     <div class="cz">
-      <el-button type="primary" size="small" @click="viewlog">查看日志</el-button>
+      <!-- <el-button type="primary" size="small" @click="viewlog">查看日志</el-button> -->
     </div>
   </div>
 </template>
 <script>
 export default {
+  props: {
+    fileInfor: {
+      type: Object,
+      defalute: {}
+    }
+  },
+  data () {
+    return {
+      checked: false
+    }
+  },
   methods: {
     viewlog () {
       this.$emit('viewlog')
+    },
+    changeChange () {
+      console.log('***', this.checked)
+      this.$emit('changeChange', this.checked)
     }
   }
 }
@@ -34,6 +50,8 @@ export default {
     width: 60px;
     height: 60px;
     margin: 0px 10px;
+    overflow: hidden;
+    border-radius: 50%;
     img {
       width: 100%;
       display: block;
