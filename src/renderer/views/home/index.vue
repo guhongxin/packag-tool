@@ -137,8 +137,8 @@
           <li class="build-menu-item" :class="{activeMenu: activeMune === 2}" @click="buildMenuItemClick(2)">失败<span>({{packageError.length}})</span></li>
         </ul>
         <div class="build-page-head-right">
-          <span class="el-icon-upload" @click="viewlog" v-if="activeMune === 2">
-            <span class="tishi-span">{{againPackage.length}}</span>
+          <span class="el-icon-upload" @click="againPackageClick" v-if="activeMune === 2">
+            <span class="tishi-span">{{selectpackageErrorNum}}</span>
           </span>
           <!-- <span class="el-icon-reading" @click="viewlog"></span> -->
         </div>
@@ -224,7 +224,7 @@ export default {
       packing: [], // 正在打包
       packageSuccessful: [], // 打包成功
       packageError: [], // 打包异常
-      againPackage: [] // 重新上传的包
+      selectpackageErrorNum: 0 // 重新上传的包
     }
   },
   mounted () {
@@ -477,6 +477,45 @@ export default {
     packageErrorItemChange (val, item) {
       // 打包失败页面没一项前面的选中
       this.$set(item, 'checked', val)
+    },
+    againPackageClick () {
+      // 重新打包
+      if (this.selectpackageErrorNum === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请选择需要重新打包的项！'
+        })
+        return false
+      }
+      let _channelIds = []
+      for (let i = 0; i < this.packageError.length; i++) {
+        if (this.packageError[i].checked) {
+          //  选中的
+          _channelIds.push(this.packageError[i].bundleId)
+          let _aginPack = JSON.parse(JSON.stringify(this.packageError[i]))
+          delete _aginPack.checked
+          this.packing.push(_aginPack)
+          this.packageError.splice(i, 1)
+          i = i - 1
+        }
+      }
+      let _filePath = path.resolve('', '1.json')
+      this.setbundleMake(_channelIds).then(res => {
+        // 获取正在打包的文件
+        let data = res.content.bundles
+        try {
+          fs.writeFileSync(_filePath, JSON.stringify(data))
+          let javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
+          let javaCli1 = path.resolve('', './fusion-playground.zip')
+          let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -d ${javaCli1}  -i ${this.form.busAddress} -o ${this.form.outputPath}`
+          this.start(_cmdStr)
+        } catch (error) {
+          console.log('error', error)
+        }
+        this.stepClickLoading = false
+      }).catch(() => {
+        this.stepClickLoading = false
+      })
     }
   },
   components: {
@@ -547,7 +586,7 @@ export default {
     packageError: {
       handler (val) {
         let _selectval = val.filter(item => item.checked)
-        this.againPackage = _selectval
+        this.selectpackageErrorNum = _selectval.length
       },
       deep: true
     }
