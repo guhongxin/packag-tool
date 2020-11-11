@@ -41,7 +41,7 @@ export default {
       icon: '',
       listQuery: {
         cur: 1,
-        count: 100
+        len: 100
       },
       sourceData: [],
       gameData: [],

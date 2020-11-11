@@ -39,7 +39,7 @@ export default {
       dialogVisible: false,
       listQuery: {
         cur: 1,
-        count: 100
+        len: 100
       },
       tableData: [],
       tableLoading: false,
