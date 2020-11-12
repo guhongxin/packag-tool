@@ -169,8 +169,8 @@
       </div>
     </div>
     <channelDetail ref="channelDetailDoc"></channelDetail>
-    <signatureCertificateDailog ref="signatureCertificateDailogDoc"
-      @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog>
+    <!-- <signatureCertificateDailog ref="signatureCertificateDailogDoc"
+      @btnOK="signatureCertificateDailogDocBtn"></signatureCertificateDailog> -->
     <!-- 日志 -->
     <journal ref="journalDoc"></journal>
     <!-- 渠道列表 -->
@@ -183,7 +183,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import signatureCertificateDailog from './components/signatureCertificateDailog'
+// import signatureCertificateDailog from './components/signatureCertificateDailog'
 import channelItem from './components/channelItem'
 import channelDetail from './components/channelDetail'
 import outBag from './components/outBag'
@@ -397,6 +397,7 @@ export default {
         self.pid = workerProcess.pid
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
+          console.log('stdout', data)
           let progress = data.match(reg) // 获取内容
           if (progress) {
             let _progress = JSON.parse(progress[0])
@@ -409,6 +410,7 @@ export default {
           console.log('stderr: ' + data)
           let errData = JSON.parse(JSON.stringify(self.packing))
           self.packageError = errData
+          console.log('**8888', self.packageError)
           self.packing = []
         })
         // 退出之后的输出
@@ -426,19 +428,25 @@ export default {
     },
     resetData () {
       // 复位数据
+      this.step = 1
+      this.channelName = ''
       this.form = {
         status: '',
         key: '',
         secret: '',
         busAddress: '', // 母包地址
-        outputPath: '', // 输出地址
-        // fileName: '', // 输出文件名
-        signCertificate: '' // 签名证书
+        outputPath: '' // 输出地址
       }
       this.activeMune = 0
-      this.step = 1
-      this.channelName = ''
+      this.currentTabComponent = 'outBag'
       this.copyChannelData = []
+      this.channelData = []
+      this.channelIds = []
+      this.stepClickLoading = false
+      this.packing = []
+      this.packageSuccessful = []
+      this.packageError = []
+      this.selectpackageErrorNum = 0
     },
     searchChannelName (val) {
       // 渠道名称搜索
@@ -520,7 +528,6 @@ export default {
     }
   },
   components: {
-    signatureCertificateDailog,
     channelItem,
     channelDetail,
     outBag,
@@ -577,10 +584,9 @@ export default {
           // 查看有没有执行完成的包 进度为100% 代表完成
           if (val[i].per === 100) {
             this.packageSuccessful.push(val[i])
-            val.splice(i)
+            val.splice(i, 1)
           }
         }
-        console.log('this.packageSuccessful', this.packageSuccessful)
       },
       deep: true
     },
