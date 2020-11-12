@@ -29,18 +29,6 @@
               <el-form-item v-for="(item, index) in Object.keys(form)" :key="index" :label="item" prop="name" class="w-form-item">
                 <el-input v-model="form[item]" disabled></el-input>
               </el-form-item>
-              <!-- <el-form-item label="包名" prop="name" class="w-form-item">
-                <el-input v-model="form.name"></el-input>
-              </el-form-item>
-              <el-form-item label="parentChannelCo" prop="name" class="w-form-item">
-                <el-input v-model="form.name"></el-input>
-              </el-form-item>
-              <el-form-item label="productCode" prop="name" class="w-form-item">
-                <el-input v-model="form.name"></el-input>
-              </el-form-item>
-              <el-form-item label="横竖屏设置" prop="name" class="w-form-item">
-                <el-input v-model="form.name"></el-input>
-              </el-form-item> -->
             </el-form>
           </template>
           <template v-else-if="currentMenu === 1">
@@ -99,7 +87,7 @@
             <div class="icon-change">
               <div class="icon-screen-content">
                 <div class="icon-screen-content-left">
-                  <div class="icon-screen" :style="{'background-image': 'url('+baseInfor.icon+')'}">
+                  <div class="icon-screen" :style="{'background-image': baseInfor.icon ? 'url('+baseInfor.icon+')' : ''}">
                     <!-- <img :src="baseInfor.icon" style="width: 100%"/> -->
                   </div>
                   <p class="wz-js">现有icon</p>
@@ -161,6 +149,13 @@ export default {
   },
   methods: {
     handleClose () {
+      this.form = {}
+      this.currentMenu = 0
+      this.iconUrl = ''
+      this.saveIconLoading = false
+      this.flashScreen = 'verPic'
+      this.verPic = ''
+      this.horPic = ''
       this.dialogVisible = false
     },
     showModule (param) {

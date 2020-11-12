@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="side-bar">
-      <div class="logo">
-        <img src="../../../assets/image/logo.png" />
-      </div>
-      <div class="game">
-        <div class="game-logo">
+      <div class="side-bar-frist">
+        <div class="logo">
+          <img src="../../../assets/image/logo.png" />
+        </div>
+         <div class="game-logo">
           <img :src="icon" />
         </div>
         <div class="search-box">
@@ -17,6 +17,8 @@
             <i slot="suffix" class="el-input__icon el-icon-search"></i>
           </el-input>
         </div>
+      </div>
+      <div class="game">
         <div class="game-list">
           <ul>
             <li class="game-item"
@@ -89,7 +91,13 @@ export default {
   height: 100vh;
   overflow: hidden;
   overflow-y: auto;
-  .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .side-bar-frist {
+    height: 200px;
+    .logo {
       width: 100%;
       height: 50px;
       box-sizing: border-box;
@@ -102,30 +110,36 @@ export default {
         display: block;
       }
     }
-  .game {
-    margin-top: 40px;
-    padding: 0px 10px;
-    box-sizing: border-box;
     .game-logo {
       width: 40%;
-      margin: 0px auto;
+      margin: 10px auto 0px;
       img {
         width: 100%;
         display: block;
       }
     }
     .search-box {
-      margin: 40px 0px;
+      margin: 20px 0px;
       /deep/ .el-input__inner{
         border-radius: 16px;
       }
     }
+  }
+  .game {
+    width: 100%;
+    padding: 0px;
+    box-sizing: border-box;
+    flex: 1;
+    overflow: hidden;
     .game-list {
+      height: 100%;
+      overflow: auto;
       margin-left: -10px;
       margin-right: -10px;
+      transform: translateX(10px);
       ul {
         margin: 0px;
-        padding: 0px 0px 50px;
+        padding: 0px 0px;
         li {
           list-style-type:none;
           color: #ffffff;
@@ -151,9 +165,6 @@ export default {
   .edition {
     width: 160px;
     height: 50px;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
     padding: 0px 5px;
     line-height: 50px;
     font-size: 12px;
