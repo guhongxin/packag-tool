@@ -107,8 +107,8 @@
                 全选渠道
               </div>
               <div class="cccl-footer-kj">
-                <i class="el-icon-time"></i>
-                选择上次
+                <!-- <i class="el-icon-time"></i>
+                选择上次 -->
               </div>
             </div>
           </div>
@@ -639,7 +639,7 @@ export default {
   }
 }
 .channel-config {
-  margin: 40px auto 0px;
+  margin: 20px auto 0px;
   box-sizing: border-box;
   background-color: #ffffff;
   border: 1px solid #DCDFE6;
@@ -716,6 +716,8 @@ export default {
     .cccr {
       flex: 4;
       height: 400px;
+      overflow: hidden;
+      overflow-y: auto;
     }
   }
 }
@@ -818,11 +820,11 @@ export default {
   cursor: pointer;
 }
 .step-status-box {
-  margin: 20px auto 0px;
+  margin: 10px auto 0px;
   box-sizing: border-box;
 }
 .channel-config-footer {
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: center;
 }
 .step-status-box /deep/ .el-steps--simple {

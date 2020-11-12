@@ -10,7 +10,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-main {
-  padding: 10px;
+  padding: 5px;
   box-sizing: border-box;
 }
 </style>

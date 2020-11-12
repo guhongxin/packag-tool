@@ -164,9 +164,9 @@ export default {
   }
   .edition {
     width: 160px;
-    height: 50px;
+    height: 30px;
     padding: 0px 5px;
-    line-height: 50px;
+    line-height: 30px;
     font-size: 12px;
     color: #ffffff;
     background-color: rgb(38, 52, 69);
