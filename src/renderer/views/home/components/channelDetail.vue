@@ -99,21 +99,14 @@
             <div class="icon-change">
               <div class="icon-screen-content">
                 <div class="icon-screen-content-left">
-                  <div class="icon-screen">
-                    <img :src="baseInfor.icon" style="width: 100%"/>
+                  <div class="icon-screen" :style="{'background-image': 'url('+baseInfor.icon+')'}">
+                    <!-- <img :src="baseInfor.icon" style="width: 100%"/> -->
                   </div>
                   <p class="wz-js">现有icon</p>
                 </div>
                 <div class="icon-screen-content-right">
-                  <el-upload
-                    class="avatar-uploader"
-                    :action="VUE_APP_UPLOADURL + '/upload/single'"
-                    :show-file-list="false"
-                    :on-success="handleIconSuccess"
-                    :before-upload="beforeIconUpload">
-                    <img v-if="iconUrl" :src="iconUrl" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                  </el-upload>
+                  <imgView :url="iconUrl" v-if="iconUrl" @deleteClick="deleteImage('iconUrl')"></imgView>
+                  <upload v-else @successUpload="(val) => successUpload(val, 'iconUrl')"></upload>
                 </div>
               </div>
               <div class="icon-screen-foolter">
@@ -129,8 +122,14 @@
 </template>
 <script>
 import { bundleUpdate } from '@/api/pageApi'
+import imgView from './imgView'
+import upload from './upload'
 import axios from 'axios'
 export default {
+  components: {
+    upload,
+    imgView
+  },
   data () {
     return {
       title: '渠道名称',
@@ -206,9 +205,7 @@ export default {
       }
       let obj = {
         id: this.baseInfor.id,
-        metas: {
-          icon: this.iconUrl
-        }
+        icon: this.iconUrl
       }
       this.setbundleUpdate(obj, '更新icon成功', 'saveIconLoading').then(() => {
         this.baseInfor.icon = this.iconUrl
@@ -319,6 +316,14 @@ export default {
       }
     },
     deleImage (key) {
+      this[key] = ''
+    },
+    successUpload (url, key) {
+      // 上传图片
+      this[key] = url
+    },
+    deleteImage (key) {
+      // 删除文件
       this[key] = ''
     }
   }
@@ -464,6 +469,9 @@ export default {
       border: 1px solid #f5f7fa;
       margin: 0px auto;
       position: relative;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
     }
   }
   .icon-screen-foolter {

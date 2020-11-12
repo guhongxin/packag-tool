@@ -47,7 +47,7 @@
             >存放路径</el-button
           >
         </el-form-item>
-        <el-form-item label="签名证书" class="w-form-item">
+        <!-- <el-form-item label="签名证书" class="w-form-item">
           <el-input v-model="form.signCertificate" disabled></el-input>
           <el-button
             type="primary"
@@ -55,7 +55,7 @@
             @click="signatureCertificate"
             >签名证书</el-button
           >
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="输出文件名称">
           <el-input v-model="form.fileName"></el-input>
         </el-form-item> -->
@@ -251,15 +251,15 @@ export default {
         callback(res)
       })
     },
-    signatureCertificate () {
-      // 签名证书
-      this.$refs.signatureCertificateDailogDoc.showModule()
-    },
-    signatureCertificateDailogDocBtn (param) {
-      // 签名证书确定
-      this.form.signCertificate = param.selectsignatureName
-      this.form.selectsignatureId = param.selectsignatureId
-    },
+    // signatureCertificate () {
+    //   // 签名证书
+    //   this.$refs.signatureCertificateDailogDoc.showModule()
+    // },
+    // signatureCertificateDailogDocBtn (param) {
+    //   // 签名证书确定
+    //   this.form.signCertificate = param.selectsignatureName
+    //   this.form.selectsignatureId = param.selectsignatureId
+    // },
     findConfig (item) {
       // 查看配置详情
       this.$refs.channelDetailDoc.showModule(item)
@@ -414,6 +414,7 @@ export default {
         // 退出之后的输出
         workerProcess.on('close', function (code) {
           console.log('out code：' + code)
+          console.log(0)
         })
       }
     },
