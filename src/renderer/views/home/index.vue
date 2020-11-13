@@ -195,6 +195,7 @@ import JDIC from './components/JDIC'
 import channelVersion from './components/channelVersion'
 import { bundlePaging, bundleMake } from '@/api/pageApi'
 const exec = require('child_process').exec
+const spawn = require('child_process').spawn
 const fs = require('fs')
 const path = require('path')
 export default {
@@ -325,9 +326,9 @@ export default {
             let obj = {
               bundleId: item,
               name: this.gameBaseInfor.name,
-              bundleName: _packChannelData.bundleName, // 渠道名
+              bundleName: _packChannelData.bundleName, // bundle名
               outputPath: this.form.outputPath, // 输出文件路径
-              icon: _packChannelData.icon,
+              icon: _packChannelData.icon, // 渠道名
               per: 0, // 百分比
               journal: [] // 日志
             }
@@ -340,6 +341,7 @@ export default {
           fs.writeFileSync(_filePath, JSON.stringify(data))
           let javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
           let javaCli1 = path.resolve('', './fusion-playground.zip')
+          console.log('this.form.busAddress', this.form.busAddress)
           let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -d ${javaCli1}  -i ${this.form.busAddress} -o ${this.form.outputPath}`
           this.start(_cmdStr)
         } catch (error) {
@@ -394,12 +396,21 @@ export default {
       runExec(cmdStr)
       function runExec (cmdStr) {
         console.log('cmdStr', cmdStr)
-        workerProcess = exec(cmdStr)
+        let kk = false
+        if (kk) {
+          workerProcess = exec(cmdStr)
+        } else {
+          workerProcess = spawn('cmd.exe', ['/s', '/c', cmdStr], {
+            cwd: null,
+            env: null
+          })
+        }
         self.pid = workerProcess.pid
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
-          console.log('stdout', data)
-          let progress = data.match(reg) // 获取内容
+          console.log('stdout', data.toString())
+          let _data = data.toString()
+          let progress = _data.match(reg) // 获取内容
           if (progress) {
             let _progress = JSON.parse(progress[0])
             console.log('_progress', _progress)
@@ -426,12 +437,6 @@ export default {
           }
         })
       }
-    },
-    killtest () {
-      exec(`TASKKILL /pid ${this.pid}`, function (err, data) {
-        if (err) console.log(err)
-        else console.log('kill pid: ' + this.pid + ' success!')
-      })
     },
     resetData () {
       // 复位数据
@@ -580,6 +585,7 @@ export default {
           obj.verPic = _channel.verPic
           obj.bundleName = _channel.bundleName
           obj.icon = _channel.icon
+          obj.channelName = _channel.channelName
           this.channelList.push(obj)
         }
       },

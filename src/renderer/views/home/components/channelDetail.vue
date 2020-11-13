@@ -125,13 +125,7 @@ export default {
       form: {},
       rules: {},
       currentMenu: 0,
-      menuOptions: [{
-        text: '客户端参数'
-      }, {
-        text: '闪屏'
-      }, {
-        text: 'icon'
-      }],
+      menuOptions: [],
       baseInfor: {},
       VUE_APP_UPLOADURL: '',
       VUE_APP_IMGURL: '',
@@ -157,12 +151,27 @@ export default {
       this.verPic = ''
       this.horPic = ''
       this.dialogVisible = false
+      this.menuOptions = []
     },
     showModule (param) {
       this.dialogVisible = true
       this.baseInfor = param
-      console.log('param', param)
       let clientParam = param.params
+      if (param.channelName === 'm4399') {
+        this.menuOptions = [{
+          text: '客户端参数'
+        }, {
+          text: '闪屏'
+        }, {
+          text: 'icon'
+        }]
+      } else {
+        this.menuOptions = [{
+          text: '客户端参数'
+        }, {
+          text: 'icon'
+        }]
+      }
       Object.keys(clientParam).forEach(item => {
         if (item !== 'icon') {
           this.$set(this.form, item, clientParam[item])
