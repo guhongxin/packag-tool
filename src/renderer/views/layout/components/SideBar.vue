@@ -66,6 +66,15 @@ export default {
       })
     },
     gameClick (index, item) {
+      let _isPacking = this.$store.state.Game.isPacking
+      console.log('_isPacking', _isPacking)
+      if (_isPacking) {
+        this.$message({
+          type: 'warning',
+          message: '正在进行打包，请注意不要进行其它操作'
+        })
+        return false
+      }
       this.currentGameIndex = index
       this.icon = item.icon
       this.$store.dispatch('gameAction', item)

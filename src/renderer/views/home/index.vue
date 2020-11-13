@@ -406,6 +406,7 @@ export default {
           })
         }
         self.pid = workerProcess.pid
+        self.$store.dispatch('packingAction', true)
         // 打印正常的后台可执行程序输出
         workerProcess.stdout.on('data', function (data) {
           console.log('stdout', data.toString())
@@ -435,6 +436,7 @@ export default {
             self.packageError = errData
             self.packing = []
           }
+          self.$store.dispatch('packingAction', false)
         })
       }
     },
