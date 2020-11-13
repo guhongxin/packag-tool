@@ -161,6 +161,7 @@ export default {
     showModule (param) {
       this.dialogVisible = true
       this.baseInfor = param
+      console.log('param', param)
       let clientParam = param.params
       Object.keys(clientParam).forEach(item => {
         if (item !== 'icon') {

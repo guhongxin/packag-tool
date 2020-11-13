@@ -393,6 +393,7 @@ export default {
       let reg = /\{.*\}/g
       runExec(cmdStr)
       function runExec (cmdStr) {
+        console.log('cmdStr', cmdStr)
         workerProcess = exec(cmdStr)
         self.pid = workerProcess.pid
         // 打印正常的后台可执行程序输出
@@ -401,7 +402,10 @@ export default {
           let progress = data.match(reg) // 获取内容
           if (progress) {
             let _progress = JSON.parse(progress[0])
+            console.log('_progress', _progress)
             let _packChannelIndex = self.packing.findIndex(item => _progress.bundleId === item.bundleId)
+            console.log('_packChannelIndex', _packChannelIndex)
+            console.log('self.packing', self.packing)
             self.$set(self.packing[_packChannelIndex], 'per', _progress.per * 100)
           }
         })
@@ -410,13 +414,16 @@ export default {
           console.log('stderr: ' + data)
           let errData = JSON.parse(JSON.stringify(self.packing))
           self.packageError = errData
-          console.log('**8888', self.packageError)
           self.packing = []
         })
         // 退出之后的输出
         workerProcess.on('close', function (code) {
           console.log('out code：' + code)
-          console.log(0)
+          if (self.packing.length > 0) {
+            let errData = JSON.parse(JSON.stringify(self.packing))
+            self.packageError = errData
+            self.packing = []
+          }
         })
       }
     },
