@@ -136,11 +136,11 @@
           <li class="build-menu-item" :class="{activeMenu: activeMune === 1}" @click="buildMenuItemClick(1)">成功<span>({{packageSuccessful.length}})</span></li>
           <li class="build-menu-item" :class="{activeMenu: activeMune === 2}" @click="buildMenuItemClick(2)">失败<span>({{packageError.length}})</span></li>
         </ul>
-        <div class="build-page-head-right">
-          <span class="el-icon-upload" @click="againPackageClick" v-if="activeMune === 2">
+        <div class="build-page-head-right" v-if="activeMune === 2">
+          <span class="el-icon-upload" @click="againPackageClick" >
             <span class="tishi-span">{{selectpackageErrorNum}}</span>
           </span>
-          <!-- <span class="el-icon-reading" @click="viewlog"></span> -->
+          <span class="el-icon-reading" @click="viewlog"></span>
         </div>
       </div>
       <div class="build-page-content">
@@ -204,8 +204,8 @@ log4js.configure({
     cheese: {
       type: 'file',
       filename: 'cheese.log',
-      maxLogSize: 1024,
-      backups: 3,
+      maxLogSize: 1024 * 100,
+      backups: 1,
       category: 'normal'
     }
   },
@@ -292,7 +292,9 @@ export default {
     },
     viewlog () {
       // 查看日志
-      this.$refs.journalDoc.showModule()
+      // this.$refs.journalDoc.showModule()
+      let _path = path.resolve('')
+      this.$electron.shell.openExternal(_path)
     },
     noConfigChannel () {
       // 未配置渠道
@@ -434,10 +436,7 @@ export default {
           // logger.info(_data)
           if (progress) {
             let _progress = JSON.parse(progress[0])
-            console.log('_progress', _progress)
             let _packChannelIndex = self.packing.findIndex(item => _progress.bundleId === item.bundleId)
-            console.log('_packChannelIndex', _packChannelIndex)
-            console.log('self.packing', self.packing)
             self.$set(self.packing[_packChannelIndex], 'per', _progress.per * 100)
           }
         })
