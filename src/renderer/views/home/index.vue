@@ -140,7 +140,9 @@
           <span class="el-icon-upload" @click="againPackageClick" >
             <span class="tishi-span">{{selectpackageErrorNum}}</span>
           </span>
-          <span class="el-icon-reading" @click="viewlog"></span>
+          <el-tooltip class="item" effect="dark" content="打开目录，日志文件后缀为.log" placement="top">
+            <span class="el-icon-reading" @click="viewlog"></span>
+          </el-tooltip>
         </div>
       </div>
       <div class="build-page-content">
@@ -292,9 +294,9 @@ export default {
     },
     viewlog () {
       // 查看日志
-      // this.$refs.journalDoc.showModule()
-      let _path = path.resolve('', './*.log')
+      let _path = path.resolve('')
       this.$electron.shell.openExternal(_path)
+      // this.$electron.shell.showItemInFolder(_path)
     },
     noConfigChannel () {
       // 未配置渠道
