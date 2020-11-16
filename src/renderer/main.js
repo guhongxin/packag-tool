@@ -26,7 +26,8 @@ import {
   Icon,
   Upload,
   Tabs,
-  TabPane
+  TabPane,
+  Tooltip
 } from 'element-ui'
 
 import './permission.js'
@@ -47,6 +48,7 @@ Vue.use(Icon)
 Vue.use(Upload)
 Vue.use(Tabs)
 Vue.use(TabPane)
+Vue.use(Tooltip)
 Vue.use(Loading.directive)
 
 Vue.prototype.$loading = Loading.service

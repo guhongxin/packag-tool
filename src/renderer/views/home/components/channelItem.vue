@@ -8,7 +8,13 @@
           </div>
           <div class="channel-base-infor-txt">
             <div class="channel-name">{{baseInfor.name}}</div>
-            <div class="channel-no">渠道号：<span>暂无</span></div>
+            <div class="channel-no">渠道名：
+              <div class="channelName">
+                <el-tooltip class="item" effect="dark" content="dasd" placement="top">
+                  <span>{{baseInfor.channelName}}</span>
+                </el-tooltip>
+              </div>
+            </div>
           </div>
         </div>
         <p class="channel-other-infor">
@@ -141,6 +147,18 @@ export default {
         justify-content: space-evenly;
         font-size: 12px;
         padding-left: 10px;
+        .channel-no {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .channelName {
+            flex: 1;
+            display: block;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          }
+        }
       }
     }
     .channel-other-infor {

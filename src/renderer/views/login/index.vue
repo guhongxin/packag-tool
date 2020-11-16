@@ -64,7 +64,11 @@ export default {
     }
   },
   mounted () {
-    this.configUrl = path.resolve('', 'config.json')
+    if (process.env.NODE_ENV === 'development') {
+      this.configUrl = path.resolve('', 'config.json')
+    } else {
+      this.configUrl = process.resourcesPath + '/config.json'
+    }
     this.config = JSON.parse(fs.readFileSync(this.configUrl))
     if (this.config.isRemember) {
       this.isRememberPassword = true

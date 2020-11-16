@@ -24,12 +24,16 @@
   "build": {
     "productName": "打包工具",
     "appId": "com.example.yourapp",
+    "extraResources": [
+      "./config.json",
+      "./fusion-cli-0.0.1.jar",
+      "./fusion-playground.zip"
+    ],
     "directories": {
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*",
-      "config.json"
+      "dist/electron/**/*"
     ],
     "dmg": {
       "contents": [
@@ -61,6 +65,7 @@
     "blueimp-md5": "^2.18.0",
     "element-ui": "^2.13.2",
     "js-cookie": "^2.2.1",
+    "log4js": "^6.3.0",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "vue": "^2.5.16",

@@ -83,7 +83,7 @@
           </div>
           <div class="channel-status-row-right">
             <el-input
-              placeholder="多个渠道以空格分隔"
+              placeholder="多个渠道以逗号分隔"
               size="small"
               v-model="channelName"
               @change="searchChannelName">
@@ -198,6 +198,25 @@ const exec = require('child_process').exec
 const spawn = require('child_process').spawn
 const fs = require('fs')
 const path = require('path')
+const log4js = require('log4js')
+log4js.configure({
+  appenders: {
+    cheese: {
+      type: 'file',
+      filename: 'cheese.log',
+      maxLogSize: 1024,
+      backups: 3,
+      category: 'normal'
+    }
+  },
+  categories: {
+    default: {
+      appenders: ['cheese'],
+      level: 'info'
+    }
+  }
+})
+const logger = log4js.getLogger('cheese')
 export default {
   name: 'home',
   data () {
@@ -412,6 +431,7 @@ export default {
           console.log('stdout', data.toString())
           let _data = data.toString()
           let progress = _data.match(reg) // 获取内容
+          // logger.info(_data)
           if (progress) {
             let _progress = JSON.parse(progress[0])
             console.log('_progress', _progress)
@@ -424,6 +444,7 @@ export default {
         // 打印错误的后台可执行程序输出
         workerProcess.stderr.on('data', function (data) {
           console.log('stderr: ' + data)
+          logger.info(data.toString())
           let errData = JSON.parse(JSON.stringify(self.packing))
           self.packageError = errData
           self.packing = []
