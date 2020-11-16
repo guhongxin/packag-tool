@@ -293,7 +293,7 @@ export default {
     viewlog () {
       // 查看日志
       // this.$refs.journalDoc.showModule()
-      let _path = path.resolve('')
+      let _path = path.resolve('', './*.log')
       this.$electron.shell.openExternal(_path)
     },
     noConfigChannel () {
@@ -548,8 +548,15 @@ export default {
         let data = res.content.bundles
         try {
           fs.writeFileSync(_filePath, JSON.stringify(data))
-          let javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
-          let javaCli1 = path.resolve('', './fusion-playground.zip')
+          let javaCli = ''
+          let javaCli1 = ''
+          if (process.env.NODE_ENV === 'development') {
+            javaCli = path.resolve('', './fusion-cli-0.0.1.jar')
+            javaCli1 = path.resolve('', './fusion-playground.zip')
+          } else {
+            javaCli = process.resourcesPath + '/fusion-cli-0.0.1.jar'
+            javaCli1 = process.resourcesPath + '/fusion-playground.zip'
+          }
           let _cmdStr = `java -jar ${javaCli} -c ${_filePath} -d ${javaCli1}  -i ${this.form.busAddress} -o ${this.form.outputPath}`
           this.start(_cmdStr)
         } catch (error) {

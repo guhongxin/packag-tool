@@ -6,11 +6,22 @@
       <li class="menu-item">功能三</li>
       <li class="menu-item">功能四</li>
     </ul>
+    <div class="right">
+      <i class="sign-out" @click="signOut"></i>
+    </div>
   </div>
 </template>
 <script>
+import { removeAllCookie } from '@/utils/auth.js'
 export default {
-  name: 'navBar'
+  name: 'navBar',
+  methods: {
+    signOut () {
+      // 退出
+      removeAllCookie()
+      this.$router.push('/')
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -22,6 +33,9 @@ export default {
   position: sticky;
   top: 0px;
   z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   .menu {
     margin: 0px;
     padding: 0px;
@@ -44,6 +58,17 @@ export default {
     .active-menu-item {
       background-color: #304156;
       color: rgb(64, 158, 255);
+    }
+  }
+  .right {
+    padding-right: 10px;
+    .sign-out {
+      display: block;
+      height: 20px;
+      width: 20px;
+      background: url("../../../assets/image/signOut.png") no-repeat center;
+      background-size: contain;
+      cursor: pointer;
     }
   }
 }
