@@ -19,6 +19,7 @@ export default {
     signOut () {
       // 退出
       removeAllCookie()
+      this.$store.dispatch('packingAction', false)
       this.$router.push('/')
     }
   }

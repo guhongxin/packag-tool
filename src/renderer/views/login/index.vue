@@ -64,6 +64,7 @@ export default {
     }
   },
   mounted () {
+    this.$store.dispatch('packingAction', false)
     if (process.env.NODE_ENV === 'development') {
       this.configUrl = path.resolve('', 'config.json')
     } else {
