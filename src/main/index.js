@@ -23,16 +23,22 @@ function createWindow () {
     useContentSize: true,
     width: 900,
     // fullscreenable: false, // 禁用全屏
-    maximizable: false
+    maximizable: true
   })
+  // mainWindow.webContents.openDevTools()
   mainWindow.loadURL(winURL)
-  mainWindow.webContents.openDevTools()
   mainWindow.on('closed', () => {
     mainWindow = null
   })
 }
 
-app.on('ready', createWindow)
+app.on('ready', function () {
+  createWindow()
+})
+
+app.on('will-quit', () => {
+  // globalShortcut.unregister()
+})
 
 app.on('window-all-closed', () => {
   console.log('刷新页面')

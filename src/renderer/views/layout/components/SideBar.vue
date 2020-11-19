@@ -57,8 +57,11 @@ export default {
     gameList () {
       // 游戏列表
       appPaging(this.listQuery).then(res => {
-        this.sourceData = JSON.parse(JSON.stringify(res.content.page.records))
-        this.gameData = res.content.page.records
+        let data = res.content.page.records
+        console.log('data', data)
+        let _data = data.filter(item => !/t/gi.test(item.name))
+        this.sourceData = JSON.parse(JSON.stringify(_data))
+        this.gameData = _data
         this.icon = this.gameData[0].icon
         this.$store.dispatch('gameAction', this.gameData[0])
       }).catch(() => {

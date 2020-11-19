@@ -6,7 +6,15 @@
 
 <script>
   export default {
-    name: 'packag-tool'
+    name: 'packag-tool',
+    mounted () {
+      let self = this
+      document.onkeydown = function (e) {
+        if (e.keyCode === 123) {
+          self.$electron.remote.getCurrentWebContents().openDevTools()
+        }
+      }
+    }
   }
 </script>
 
