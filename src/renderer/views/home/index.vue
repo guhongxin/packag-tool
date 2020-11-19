@@ -251,6 +251,7 @@ export default {
   },
   mounted () {
     let buildMenu = document.querySelector('.build-menu')
+    this.$store.dispatch('packingAction', false)
     if (buildMenu) {
       let wt = buildMenu.offsetWidth
       let activeBar = document.querySelector('.active-bar')
@@ -459,12 +460,13 @@ export default {
         // 退出之后的输出
         workerProcess.on('close', function (code) {
           console.log('out code：' + code)
+          console.log('out code：', self.$store)
+          self.$store.dispatch('packingAction', false)
           if (self.packing.length > 0) {
             let errData = JSON.parse(JSON.stringify(self.packing))
             self.packageError = errData
             self.packing = []
           }
-          self.$store.dispatch('packingAction', false)
         })
       }
     },
@@ -768,6 +770,9 @@ export default {
       height: 400px;
       overflow: hidden;
       overflow-y: auto;
+      & .channelItem:not(:last-child) {
+        margin-bottom: 2px;
+      }
     }
   }
 }

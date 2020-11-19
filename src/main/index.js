@@ -25,7 +25,6 @@ function createWindow () {
     // fullscreenable: false, // 禁用全屏
     maximizable: false
   })
-
   mainWindow.loadURL(winURL)
   mainWindow.webContents.openDevTools()
   mainWindow.on('closed', () => {
@@ -36,6 +35,7 @@ function createWindow () {
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
+  console.log('刷新页面')
   if (process.platform !== 'darwin') {
     app.quit()
   }

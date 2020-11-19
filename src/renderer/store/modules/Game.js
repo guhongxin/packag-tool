@@ -16,6 +16,7 @@ const actions = {
     commit('SET_GAME', param)
   },
   packingAction ({ commit }, param) {
+    console.log('---是否正在进行打包---', param)
     commit('SET_ISPACKING', param)
   }
 }

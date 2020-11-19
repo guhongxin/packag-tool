@@ -10,14 +10,14 @@
       <div class="left">
         <ul class="menu">
           <li class="menu-item" v-for="(item, index) in menuOptions"
-            :class="{'active-menu-item': currentMenu === index}"
+            :class="{'active-menu-item': currentMenu === item.key}"
             :key="index"
-            @click="menuItem(index)">{{item.text}}</li>
+            @click="menuItem(item.key)">{{item.text}}</li>
         </ul>
       </div>
       <div class="right">
         <div class="content">
-          <template v-if="currentMenu === 0">
+          <template v-if="currentMenu === 'params'">
             <el-form 
               :model="form" :rules="rules"
               size="small"
@@ -31,7 +31,7 @@
               </el-form-item>
             </el-form>
           </template>
-          <template v-else-if="currentMenu === 1">
+          <template v-else-if="currentMenu === 'flash'">
             <div class="flash-screen">
               <el-tabs v-model="flashScreen" type="border-card">
                 <el-tab-pane label="竖屏" name="verPic">
@@ -124,7 +124,7 @@ export default {
       dialogVisible: false,
       form: {},
       rules: {},
-      currentMenu: 0,
+      currentMenu: 'params',
       menuOptions: [],
       baseInfor: {},
       VUE_APP_UPLOADURL: '',
@@ -144,7 +144,7 @@ export default {
   methods: {
     handleClose () {
       this.form = {}
-      this.currentMenu = 0
+      this.currentMenu = 'params'
       this.iconUrl = ''
       this.saveIconLoading = false
       this.flashScreen = 'verPic'
@@ -159,17 +159,22 @@ export default {
       let clientParam = param.params
       if (param.channelName === 'm4399') {
         this.menuOptions = [{
-          text: '客户端参数'
+          text: '客户端参数',
+          key: 'params'
         }, {
-          text: '闪屏'
+          text: '闪屏',
+          key: 'flash'
         }, {
-          text: 'icon'
+          text: 'icon',
+          key: 'icon'
         }]
       } else {
         this.menuOptions = [{
-          text: '客户端参数'
+          text: '客户端参数',
+          key: 'params'
         }, {
-          text: 'icon'
+          text: 'icon',
+          key: 'icon'
         }]
       }
       Object.keys(clientParam).forEach(item => {
