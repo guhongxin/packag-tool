@@ -22,7 +22,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "打包工具",
+    "productName": "猕猴桃打包工具",
     "appId": "com.example.yourapp",
     "extraResources": [
       "./config.json",

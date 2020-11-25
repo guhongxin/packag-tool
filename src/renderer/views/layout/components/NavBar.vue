@@ -1,10 +1,10 @@
 <template>
   <div class="nav-bar">
     <ul class="menu">
-      <li class="menu-item active-menu-item">功能一</li>
+      <!-- <li class="menu-item active-menu-item">功能一</li>
       <li class="menu-item">功能二</li>
       <li class="menu-item">功能三</li>
-      <li class="menu-item">功能四</li>
+      <li class="menu-item">功能四</li> -->
     </ul>
     <div class="right">
       <i class="sign-out" @click="signOut"></i>
@@ -27,7 +27,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .nav-bar {
-  height: 50px;
+  height: 40px;
   background:#1A1F27;
   box-sizing: border-box;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);

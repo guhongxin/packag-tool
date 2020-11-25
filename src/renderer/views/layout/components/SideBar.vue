@@ -29,7 +29,7 @@
           </ul>
         </div>
       </div>
-      <div class="edition">版本号：v-101</div>
+      <div class="edition">版本号：0.0.2</div>
     </div>
   </div>
 </template>

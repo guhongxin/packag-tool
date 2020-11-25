@@ -11,6 +11,8 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
+const path = require('path')
+console.log('path', path.join(__dirname, ''))
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
@@ -19,7 +21,8 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 650,
+    height: 670,
+    icon: './icons/icon.ico',
     useContentSize: true,
     width: 900,
     // fullscreenable: false, // 禁用全屏
@@ -41,7 +44,6 @@ app.on('will-quit', () => {
 })
 
 app.on('window-all-closed', () => {
-  console.log('刷新页面')
   if (process.platform !== 'darwin') {
     app.quit()
   }
